@@ -519,10 +519,10 @@ iframe {
 pre {
   word-wrap: initial !important;
   overflow: auto !important;
-  background-color: #000 !important;
+  background-color: #fdf6e3 !important;
   border-radius: 0 !important; }
   pre code {
-    color: #fff;
+    color: #93a1a1;
     white-space: pre !important; }
 
 #post__toc {
