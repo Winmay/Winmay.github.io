@@ -633,13 +633,13 @@ _.reject = function(obj, predicate, context) {
 
 1. 运行cb()函数，并得到迭代函数predicate()的值:
 
-```
+```html
 predicate=optimizeCb(value,context);			=function(value, index, collection) {      			return func.call(context, value, index, collection);   		};
 ```
 
 2. 运行_.negate()函数，通过！非运算符，返回一个新的迭代函数predicate()的否定版本。
 
-```
+```javaScript
 _.negate = function(predicate) {
   return function() {
     return !predicate.apply(this, arguments);
@@ -649,7 +649,7 @@ _.negate = function(predicate) {
 
 例：
 
-```
+```js
 var list = [1, 2, 3, 4, 5, 6];
 var test1 = _.reject(list,function (data,index,list){
 	console.log( data +','+ index );
@@ -666,7 +666,7 @@ var test1 = _.reject(list,function (data,index,list){
 console.log(test1);// [1, 3, 5]
 ```
 
-```
+```python
 var list2 = {
 	one:'a',
 	two:'b',
