@@ -516,14 +516,7 @@ iframe {
     iframe {
       height: 260px; } }
 
-pre {
-  word-wrap: initial !important;
-  overflow: auto !important;
-  background-color: #000 !important;
-  border-radius: 0 !important; }
-  pre code {
-    color: #fff;
-    white-space: pre !important; }
+
 
 #post__toc {
   width: 260px;
