@@ -519,10 +519,10 @@ iframe {
 pre {
   word-wrap: initial !important;
   overflow: auto !important;
-  background-color: #fdf6e3 !important;
+  background-color: #000 !important;
   border-radius: 0 !important; }
   pre code {
-    color: #93a1a1;
+    color: #fff;
     white-space: pre !important; }
 
 #post__toc {
@@ -1038,7 +1038,7 @@ pre > code {
 
 /* Generic */
 .highlight .k {
-  color: #859900; }
+  color: #D21026; }
 
 /* Keyword */
 .highlight .l {
@@ -1046,11 +1046,11 @@ pre > code {
 
 /* Literal */
 .highlight .n {
-  color: #93a1a1; }
+  color: #fff; }
 
 /* Name */
 .highlight .o {
-  color: #859900; }
+  color: #D21026; }
 
 /* Operator */
 .highlight .x {
@@ -1228,7 +1228,7 @@ pre > code {
 
 /* Literal.Number.Hex */
 .highlight .mi {
-  color: #2aa198; }
+  color: #9C07F7; }
 
 /* Literal.Number.Integer */
 .highlight .mo {
