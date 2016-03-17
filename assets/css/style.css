@@ -1030,7 +1030,7 @@ pre > code {
 
 /* Comment */
 .highlight .err {
-  color: #93a1a1; }
+  color: #969696; }
 
 /* Error */
 .highlight .g {
@@ -1058,7 +1058,7 @@ pre > code {
 
 /* Other */
 .highlight .p {
-  color: #93a1a1; }
+  color: #fff; }
 
 /* Punctuation */
 .highlight .cm {
@@ -1152,7 +1152,7 @@ pre > code {
 
 /* Literal.Number */
 .highlight .s {
-  color: #2aa198; }
+  color: #CED423; }
 
 /* Literal.String */
 .highlight .na {
@@ -1160,7 +1160,7 @@ pre > code {
 
 /* Name.Attribute */
 .highlight .nb {
-  color: #b58900; }
+  color: #79E1FB; }
 
 /* Name.Builtin */
 .highlight .nc {
@@ -1228,7 +1228,7 @@ pre > code {
 
 /* Literal.Number.Hex */
 .highlight .mi {
-  color: #9C07F7; }
+  color: #C376F3; }
 
 /* Literal.Number.Integer */
 .highlight .mo {
