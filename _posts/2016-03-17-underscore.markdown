@@ -167,7 +167,7 @@ console.log(text2);//Object {one: "one1", two: "two2", three: "three3"}
 
 3. 最后返回obj本身return obj;
 
-## _.map(list, iterator, [context])（_. collect）
+# 2.  _.map(list, iterator, [context])（_. collect）
 通过转换函数(iterator迭代器)映射列表中的每个值产生价值的新数组。iterator传递三个参数：value，然后是迭代 index(或 key 愚人码头注：如果list是个JavaScript对象是，这个参数就是key)，最后一个是引用指向整个list。
 
 ```
@@ -312,7 +312,7 @@ console.log(test2);
 //["one1:one", "two2:two", "three3:three"]
 ```
 
-## _.reduce(list, iterator, [memo], [context])（_.foldl/_.inject）和_.reduceRight(list, iteratee, memo, [context])（_.foldr）Memo（备忘录）是reduce函数的初始值，reduce的每一步都需要由iterator返回。这个迭代传递4个参数：memo,value 和 迭代的index（或者 key）和最后一个引用的整个 list，最后一个是引用指向整个list。如果reduce的初始调用没有传递memo，iterator将会调用列表中的第一个元素。第一个元素通过memo参数在iterator中调用并传递到列表的下一个元素中。
+# 3.  _.reduce(list, iterator, [memo], [context])（_.foldl/_.inject）和_.reduceRight(list, iteratee, memo, [context])（_.foldr）Memo（备忘录）是reduce函数的初始值，reduce的每一步都需要由iterator返回。这个迭代传递4个参数：memo,value 和 迭代的index（或者 key）和最后一个引用的整个 list，最后一个是引用指向整个list。如果reduce的初始调用没有传递memo，iterator将会调用列表中的第一个元素。第一个元素通过memo参数在iterator中调用并传递到列表的下一个元素中。
 reducRight是从右侧开始组合的元素的reduce函数，如果存在JavaScript 1.8版本的reduceRight，则用其代替。Foldr在javascript中不像其它有懒计算的语言那么有用（愚人码头注：lazy evaluation：一种求值策略，只有当表达式的值真正需要时才对表达式进行计算）。
 
 ```
