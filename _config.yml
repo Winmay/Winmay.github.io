@@ -19,7 +19,7 @@ kramdown:
     coderay_line_numbers:  nil
 
 #评论配置
-disqus: 
+disqus: winmaytang
 
 #统计配置
 baidu: 

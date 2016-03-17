@@ -1,3 +1,8 @@
+---
+layout: post
+category: 测试
+---
+
 # Underscore解析文档
 
 ## _.each(list, iterator, [context])（_.forEach）
@@ -14,6 +19,7 @@ iteratee = optimizeCb(iteratee, context);
 
 ```iteratee = function(value, index, collection) {	return func.call(context, value, index, collection);};
 ```
+
 ![](/assets/image/14581996360093.jpg)
 
 2. 判断传入的对象obj是否为数组或对象,语句：
