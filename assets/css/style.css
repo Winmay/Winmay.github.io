@@ -517,7 +517,6 @@ iframe {
       height: 260px; } }
 
 
-
 #post__toc {
   width: 260px;
   max-height: 500px;
@@ -958,6 +957,65 @@ iframe {
   -ms-animation: spin 400ms linear infinite;
   -o-animation: spin 400ms linear infinite;
   animation: spin 400ms linear infinite; }
+
+/*!-------------------------------------
+ * Syntax Colours
+ * https://gist.github.com/edwardhotchkiss/2005058
+ *
+ * Theme based on prism.js Coy theme for JavaScript, CoffeeScript, CSS and HTML
+ * @author Tim  Shedor
+ * ------------------------------------- */
+/*! Modified by Peiwen Lu @ 30 Nov 2013 */
+/* Code blocks */
+.highlight {
+  margin: 1.715em 0; }
+
+pre {
+  padding: 1em;
+  font: .9em/1.5 Consolas, Monaco, 'Andale Mono', monospace;
+  border: 1px solid #e5e8ec;
+  border-radius: 3px;
+  background-color: #fdfdfd;
+  background-image: -webkit-linear-gradient(transparent 50%, rgba(69, 142, 209, 0.04) 50%);
+  background-image: -moz-linear-gradient(transparent 50%, rgba(69, 142, 209, 0.04) 50%);
+  background-image: -ms-linear-gradient(transparent 50%, rgba(69, 142, 209, 0.04) 50%);
+  background-image: -o-linear-gradient(transparent 50%, rgba(69, 142, 209, 0.04) 50%);
+  background-image: linear-gradient(transparent 50%, rgba(69, 142, 209, 0.04) 50%);
+  background-size: 3em 3em;
+  background-origin: content-box;
+  overflow: auto;
+  -webkit-overflow-scrolling: touch; }
+  pre::-webkit-scrollbar {
+    height: 7px; }
+  pre::-webkit-scrollbar-thumb {
+    background: #e5e8ec; }
+    pre::-webkit-scrollbar-thumb:hover {
+      background: #d6dbe1; }
+
+pre > code {
+  font-family: inherit;
+  direction: ltr;
+  text-align: left;
+  white-space: pre;
+  word-spacing: normal;
+  -moz-tab-size: 4;
+  -o-tab-size: 4;
+  tab-size: 4;
+  -webkit-hyphens: none;
+  -moz-hyphens: none;
+  -ms-hyphens: none;
+  hyphens: none; }
+
+/* Inline code */
+:not(pre) > code {
+  padding: 0 4px;
+  margin: 0 4px;
+  font-size: 90%;
+  color: #c7254e;
+  white-space: nowrap;
+  font-family: Monaco, Consolas, 'Andale Mono', monospace;
+  background: #f9f2f4;
+  border-radius: 8px; }
 
 
 
