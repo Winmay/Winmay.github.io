@@ -1,6 +1,6 @@
 ---
 layout: post
-category: 测试
+category: js源码解析
 ---
 
 # 1. _.each
