@@ -680,8 +680,369 @@ var test2 = _.reject(list2,function (data,key,list){
 	return key == 'one' || key=='five' || key=='seven';
 });
 console.log(test2);// ["b", "c", "d", "f"]
-```
-			
+```# 7. _.every
+
+_.every(list, [predicate], [context])（_.all）
+如果list中的所有元素都通过predicate的真值检测就返回true。
+
+```python
+_.every = _.all = function(obj, predicate, context) {
+  predicate = cb(predicate, context);
+  var keys = !isArrayLike(obj) && _.keys(obj),
+      length = (keys || obj).length;
+  for (var index = 0; index < length; index++) {
+    var currentKey = keys ? keys[index] : index;
+    if (!predicate(obj[currentKey], currentKey, obj)) return false;
+  }
+  return true;
+};
+```
+
+1. 运行cb()函数，并得到迭代函数predicate()的值:
+
+```python
+predicate=optimizeCb(value,context);			=function(value, index, collection) {      			return func.call(context, value, index, collection);   		};
+```
+
+2. 判断obj是对象还是数组，若是对象，检索object拥有的所有可枚举属性的名称，并返回数组keys。
+3. 使用for循环，判断迭代函数 predicate()的条件，当有一条数据不满足条件时，返回false，当所有数据满足条件时，返回true。
+例：
+
+```python
+var list = [2, 4, 6, 8, 10, 12];
+var test1 = _.every(list,function (data,index,list){
+	return data % 2 == 0;
+});
+console.log(test1);// true
+```
+
+```python
+var list2 = {
+	one:'a',
+	two:'b',
+	three:'a',
+	four:'a',
+};
+var test2 = _.every(list2,function (data,key,list){
+	console.log(data);
+	return data == 'a';
+});
+/*
+a
+b
+*/
+console.log(test2);// false
+```
+
+# 8. _.some
+
+_.some(list, [predicate], [context])（_.any）
+如果list中有任何一个元素通过 predicate 的真值检测就返回true。一旦找到了符合条件的元素, 就直接中断对list的遍历。
+
+```python
+_.some = _.any = function(obj, predicate, context) {
+  predicate = cb(predicate, context);
+  var keys = !isArrayLike(obj) && _.keys(obj),
+      length = (keys || obj).length;
+  for (var index = 0; index < length; index++) {
+    var currentKey = keys ? keys[index] : index;
+    if (predicate(obj[currentKey], currentKey, obj)) return true;
+  }
+  return false;
+};
+```
+
+1. 运行cb()函数，并得到迭代函数predicate()的值:
+
+```python
+predicate=optimizeCb(value,context);			=function(value, index, collection) {      			return func.call(context, value, index, collection);   		};
+```
+
+2. 判断obj是对象还是数组，若是对象，检索object拥有的所有可枚举属性的名称，并返回数组keys。
+3. 使用for循环，判断迭代函数 predicate()的条件，当有一条数据满足条件时，返回true，当所有数据不满足条件时，返回false。与_.every()函数相反。
+例：
+
+```python
+var list = [1, 2, 3, 4, 5, 6];
+var test1 = _.some(list,function (data,index,list){
+	console.log(data);
+	return data % 2 == 0;
+});
+/*
+1
+2
+*/
+console.log(test1);// true
+```
+
+```python
+var list2 = {
+	one:'a',
+	two:'b',
+	three:'c',
+	four:'d',
+};
+var test2 = _.some(list2,function (data,key,list){
+	console.log(data);
+	return data == 'b';
+});
+/*
+a
+b
+*/
+console.log(test2);// true
+```
+
+# 9. _.contains
+
+_.contains(list, value, [fromIndex])（_.includes/_.include）
+如果list包含指定的value则返回true（愚人码头注：使用===检测）。如果list 是数组，内部使用indexOf判断。使用fromIndex来给定开始检索的索引位置。
+
+```python
+_.contains = _.includes = _.include = function(obj, item, fromIndex, guard) {
+  // _.values(object) 
+  // 返回object对象所有的属性值。
+  if (!isArrayLike(obj)) obj = _.values(obj);
+  if (typeof fromIndex != 'number' || guard) fromIndex = 0;
+  // _.indexOf(array, value, [isSorted]) 
+  // 返回value在该 array 中的索引值，如果value不存在 array中就返回-1。
+  // 使用原生的indexOf 函数，除非它失效。
+  // 如果您正在使用一个大数组，你知道数组已经排序，
+  // 传递true给isSorted将更快的用二进制搜索..,或者，
+  // 传递一个数字作为第三个参数，为了在给定的索引的数组中寻找第一个匹配值。
+  return _.indexOf(obj, item, fromIndex) >= 0;
+};
+```
+
+1. 判断obj若为对象，则运行_.values(obj)函数，返回一个数组，其数组为所有obj属性的值。
+2. 确保fromIndex的值为数字。
+3. 运行_.indexOf()函数，并检测返回值是否为-1，若是：返回false，若否：返回true。
+例：
+
+```python
+var list = [2, 4, 6, 8, 10, 12];
+var test1 = _.contains(list,6);
+console.log(test1);// true
+```
+
+```python
+var test3 = _.contains(list,6,3);
+console.log(test3);// false
+```
+
+```python
+var list2 = {
+	one:'a',
+	two:'b',
+	three:'c',
+	four:'d',
+};
+var test2 = _.contains(list2,'c');
+console.log(test2);// true
+```
+
+# 10. _.invoke
+
+_.invoke(list, methodName, *arguments)
+在list的每个元素上执行methodName方法。任何传递给invoke的额外参数，invoke都会在调用methodName方法的时候传递给它。
+
+```python
+_.invoke = restArgs(function(obj, method, args) {
+  var isFunc = _.isFunction(method);
+  return _.map(obj, function(value) {
+    var func = isFunc ? method : value[method];
+    return func == null ? func : func.apply(value, args);
+  });
+});
+```
+
+```python
+var restArgs = function(func, startIndex) {
+  startIndex = startIndex == null ? func.length - 1 : +startIndex;
+  return function() {
+    var length = Math.max(arguments.length - startIndex, 0);
+    var rest = Array(length);
+    for (var index = 0; index < length; index++) {
+      rest[index] = arguments[index + startIndex];
+    }
+    switch (startIndex) {
+      case 0: return func.call(this, rest);
+      case 1: return func.call(this, arguments[0], rest);
+      case 2: return func.call(this, arguments[0], arguments[1], rest);
+    }
+    var args = Array(startIndex + 1);
+    for (index = 0; index < startIndex; index++) {
+      args[index] = arguments[index];
+    }
+    args[startIndex] = rest;
+    return func.apply(this, args);
+  };
+};
+```	
+
+1. 运行函数restArgs()函数，并运行里面的function()函数
+2. 遍历obj对象，判断method是否为函数对象，若是，直接把函数赋给func变量，若否，得到每一个遍历obj的值value，并读取value对象中的method属性的值，并赋给func变量。
+3. 判断func是否为null，若存在，运行func函数并存在参数数组［args］，且作用域是value，若不存在，运行func函数。
+例：
+
+```python
+var list = [[5, 1, 7], [3, 2, 1]];
+var test1 = _.invoke(list,'sort');
+console.log(test1);// [[1,5,7],[1,2,3]]
+```
+
+# 11. _.pluck
+
+_.pluck (list, propertyName)
+pluck也许是map最常使用的用例模型的简化版本，即萃取数组对象中某属性值，返回一个数组。
+
+```python
+_.pluck = function(obj, key) {
+  return _.map(obj, _.property(key));
+};
+```
+
+1. 运行_.property函数，返回一个函数，这个函数返回任何传入的对象的key属性值obj(key):_.property= property (key); 
+
+```python
+var property = function(key) {
+  return function(obj) {
+    return obj == null ? void 0 : obj[key];
+  };
+};
+
+_.property = property;
+```
+
+即：
+
+```python
+_.pluck = _.map(obj,function(key){
+	return function(obj){
+		return obj == null ? void 0 : obj[key];
+	}
+}
+_.pluck = _.map(obj,function(objChild ,key){
+	return objChild == null ? void 0 : objChild [key];
+}
+```
+
+2. 运行_.map()函数，并得到返回值为obj属性值数组。例：```python
+var list =  [
+	{name: 'moe', age: 40}, 
+	{name: 'larry', age: 50}, 
+	{name: 'curly', age: 60}
+];
+var test1 = _.pluck(list,'name');
+console.log(test1);// ["moe", "larry", "curly"]
+```
+
+# 12. _.where
+
+_.where (list, properties)
+遍历list中的每一个值，返回一个数组，这个数组包含properties所列出的属性的所有的 键 - 值对。
+
+```python
+_.where = function(obj, attrs) {
+  return _.filter(obj, _.matcher(attrs));
+};
+```
+
+1. 运行_.matcher()函数，返回一个函数（断言函数），这个函数会给你一个断言可以用来辨别给定的对象是否匹配attrs指定键/值属性。
+
+```python
+_.matcher = _.matches = function(attrs) {
+  // _.extendOwn(destination, *sources) Alias: assign 
+  // 类似于 extend, 但复制source对象中自己的属性覆盖到destination目标对象。
+  // 并且返回 destination 对象. 复制是按顺序的, 
+  // 所以后面的对象属性会把前面的对象属性覆盖掉(如果有重复).
+  // （愚人码头注：不包括继承过来的属性）
+  attrs = _.extendOwn({}, attrs);
+  return function(obj) {
+    // _.isMatch(object, properties) 
+    // 告诉你properties中的键和值是否包含在object中。
+    return _.isMatch(obj, attrs);
+  };
+};
+```
+
+即：
+
+```python
+_.where = _.filter(obj,function(attrs){
+	attrs = _.extendOwn({}, attrs);
+	return function(obj){
+		return _.isMatch(obj,attrs);
+	}
+});
+```
+
+2. 运行_.filter()函数，遍历obj中的每个值，返回包含所有通过function(attrs)迭代函数真值检测的元素值。
+例：
+
+```python
+var listOfPlays = [
+	{title: 'Cymbeline', author: 'Shakespeare', year: 1611},
+	{title: 'The Tempest',author: 'Shakespeare', },
+	{title: 'The Tempest', author: 'Shakespeare', year: 1611},
+];
+var obj = {author: "Shakespeare", year: 1611};
+var list = _.where(listOfPlays,obj);
+console.log(list);
+/*[Object]
+0: Object
+	author: "Shakespeare"
+	title: "Cymbeline"
+	year: 1611
+	__proto__: Object
+1: Object
+	author: "Shakespeare"
+	title: "The Tempest"
+	year: 1611
+	__proto__: Object
+	length: 2
+	__proto__: Array[0]
+*/
+```
+
+# 13. _.findWhere 
+
+_.findWhere (list, properties)
+遍历整个list，返回匹配 properties参数所列出的所有 键 - 值 对的第一个值。如果没有找到匹配的属性，或者list是空的，那么将返回undefined。
+
+```python
+_.findWhere = function(obj, attrs) {
+  return _.find(obj, _.matcher(attrs));
+};
+```
+
+1. 运行_.matcher()函数，返回一个函数（断言函数），这个函数会给你一个断言可以用来辨别给定的对象是否匹配attrs指定键/值属性.即：```python
+_.findWhere = _.find(obj,function(attrs){
+	attrs = _.extendOwn({}, attrs);
+	return function(obj){
+		return _.isMatch(obj,attrs);
+	}
+});
+```
+
+2. 运行_.find()函数，在obj中逐项查找，返回第一个通过function(attrs)迭代函数真值检测的元素值，如果没有值传递给测试迭代器将返回undefined，如果找到匹配的元素，函数将立即返回，不会遍历整个obj。例：```python
+var publicServicePulitzers = [
+	{year: 1348, reason: "For its public service in publishing."},
+	{year: 1918,newsroom: "The New York Times",reason: "For its public"},
+	{year: 1918, reason: "For its public service in publishing."},
+	{year: 2008, newsroom: "The New York Times",reason: "For its public"},
+];
+var obj = {newsroom: "The New York Times"};
+var list = _.findWhere(publicServicePulitzers,obj);
+console.log(list);
+/*
+Object {
+	year: 1918, 
+	newsroom: "The New York Times", 
+	reason: "For its public"
+}
+*/
+```		
 
 
 
