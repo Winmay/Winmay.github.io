@@ -13,10 +13,9 @@ kramdown:
     - autolink
     - footnotes
     - smart
-  enable_coderay: true
-  syntax_highlighter: rouge
-  coderay:
-    coderay_line_numbers:  nil
+
+#高亮配置
+highlight-theme : my-github
 
 #评论配置
 disqus: winmaytang

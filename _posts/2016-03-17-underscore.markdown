@@ -3,12 +3,14 @@ layout: post
 category: js源码解析
 ---
 
-# 1. _.each
+# 集合(Collections)
+
+## 1. _.each
 
  _.each(list, iterator, [context])（_.forEach）
 遍历list中的所有元素，按顺序用遍历输出每个元素。如果传递了context参数，则把iteratee绑定到context对象上。每次调用iteratee都会传递三个参数：(element, index, list)。如果list是个JavaScript对象，iteratee的参数是 (value, key, list))。返回list以方便链式调用。（愚人码头注：如果存在原生的forEach方法，Underscore就使用它代替。）
 
-```python
+```
 _.each = _.forEach = function(obj, iteratee, context) {
 	iteratee = optimizeCb(iteratee, context);
 	var i, length;
@@ -29,15 +31,15 @@ _.each = _.forEach = function(obj, iteratee, context) {
 
 1. 首先执行“optimizeCb()”函数，得到迭代器iteratee的值。语句：
 
-```python
+```
 iteratee = optimizeCb(iteratee, context);
 ```
 即如下图函数所示，argCount没有传入参数，即选择case 3.iteratee得到的值为：
 
-```pythoniteratee = function(value, index, collection) {	return func.call(context, value, index, collection);};
+```iteratee = function(value, index, collection) {	return func.call(context, value, index, collection);};
 ```
 
-```python
+```
 var optimizeCb = function(func, context, argCount) {
   if (context === void 0) return func;
   switch (argCount == null ? 3 : argCount) {
@@ -68,17 +70,17 @@ var optimizeCb = function(func, context, argCount) {
 
 2. 判断传入的对象obj是否为数组或对象,语句：
 
-```python
+```
 if (isArrayLike(obj))
 ```
 即如下图函数所示，使用代码：
 
-```pythonlength= property('length')(collection)
+```length= property('length')(collection)
 ```
 
 判断length是否有值。
 
-```python
+```
 var property = function(key) {
   return function(obj) {
     return obj == null ? void 0 : obj[key];
@@ -95,7 +97,7 @@ var isArrayLike = function(collection) {
 
 例：
 
-```python
+```
 var a = [1,2,3];
 var b = {
 	one:'one1',
@@ -108,7 +110,7 @@ console.log(b["length"]); //undefined
 
 1) 若obj为数组，则使用for循环，遍历从obj数组的第0为开始到，到obj的最后一位结束，并求出三个数值：obj[i]（obj数组对应的值）、i（obj数组对应的索引位置）、obj（obj数组列表本身），传进迭代器iteratee中，并运行iteratee函数。
 
-```python
+```
 for (i = 0, length = obj.length; i < length; i++) {
    iteratee(obj[i], i, obj);
 }
@@ -116,7 +118,7 @@ for (i = 0, length = obj.length; i < length; i++) {
 
 例：
 
-```python
+```
 var a = [1,2,3];
 var text1 = _.each(a,function (element,index,list){
 	console.log(element+','+index);
@@ -131,13 +133,14 @@ var text1 = _.each(a,function (element,index,list){
 [1,2,3]
 */
 ```
+
 2) 若obj为对象a. 首先，检索object拥有的所有可枚举属性的名称，并返回数组keys。
 		
-```pythonvar keys = _.keys(obj);
+```var keys = _.keys(obj);
 ```
 		b. 使用for循环，遍历keys并返回它们的值（obj的属性），并求出三个值：obj[keys[i]]（obj对象属性对应的值）、keys[i]（obj对象对应的属性名称）、obj（obj对象列表本身），传进迭代器iteratee中，并运行iteratee函数。
 
-```python
+```
 var keys = _.keys(obj);
 for (i = 0, length = keys.length; i < length; i++) {
 	iteratee(obj[keys[i]], keys[i], obj);
@@ -146,7 +149,7 @@ for (i = 0, length = keys.length; i < length; i++) {
 
 例：
 
-```python
+```
 var b = {
 	one:'one1',
 	two:'two2',
@@ -169,12 +172,12 @@ console.log(text2);//Object {one: "one1", two: "two2", three: "three3"}
 
 3. 最后返回obj本身return obj;
 
-# 2.  _.map
+## 2.  _.map
 
 _.map(list, iterator, [context])（_. collect）
 通过转换函数(iterator迭代器)映射列表中的每个值产生价值的新数组。iterator传递三个参数：value，然后是迭代 index(或 key 愚人码头注：如果list是个JavaScript对象是，这个参数就是key)，最后一个是引用指向整个list。
 
-```python
+```
 _.map = _.collect = function(obj, iteratee, context) {
 	iteratee = cb(iteratee, context);
 	var keys = !isArrayLike(obj) && _.keys(obj),
@@ -190,12 +193,12 @@ _.map = _.collect = function(obj, iteratee, context) {
 
 1. 首先执行“cb()”函数，得到迭代器iteratee的值。语句：
 
-```python
+```
 iteratee = cb(iteratee, context);
 ```
 即如下图函数所示：
 
-```python
+```
 var cb = function(value, context, argCount) {
   // _.identity(value) 返回与传入参数相等的值. 相当于数学里的: f(x) = x,
   // 这个函数看似无用, 但是在Underscore里被用作默认的迭代器iterator.
@@ -215,7 +218,7 @@ var cb = function(value, context, argCount) {
 1) 若value为空值
 返回与传入参数value相等的值 _.identity(value) 相当于数学里的: f(x) = x。
 
-```python
+```
 // 保持恒等函数默认迭代。
 _.identity = function(value) {
   return value;
@@ -225,13 +228,13 @@ _.identity = function(value) {
 2) 若value为函数
 运行函数“optimizeCb()”函数，得到迭代器iteratee的值。argCount没有传入参数，即选择case 3.iteratee得到的值为：
 
-```pythoniteratee = function(value, index, collection) {	return func.call(context, value, index, collection);};
+```iteratee = function(value, index, collection) {	return func.call(context, value, index, collection);};
 ```
 
 3) 若value为对象（数组或对象）
 则返回一个函数（断言函数），这个函数会给你一个断言可以用来辨别给定的对象是否匹配value（attrs）指定键/值属性.
 
-```python
+```
 _.matcher = _.matches = function(attrs) {
   // _.extendOwn(destination, *sources) Alias: assign 
   // 类似于 extend, 但复制source对象中自己的属性覆盖到destination目标对象。
@@ -249,11 +252,11 @@ _.matcher = _.matches = function(attrs) {
 
 4) 若value为其他值（数字，字符串，undefined，布尔值）,则返回一个函数，这个函数返回任何传入的对象的value属性值
 
-```python
+```
 obj(value):_.property= property (value);
 ```
 
-```python
+```
 var property = function(key) {
   return function(obj) {
     return obj == null ? void 0 : obj[key];
@@ -265,7 +268,7 @@ _.property = property;
 
 2. 判断obj是对象还是数组，若是对象，检索object拥有的所有可枚举属性的名称，并返回数组keys。3. 使用for循环，遍历keys（index）并返回它们的值（obj的属性或数组值），并求出三个值：obj[keys[i]／i]（obj对象属性（数组索引）对应的值）、keys[i]／i（obj对象对应的属性名称（数组对应的索引））、obj（obj对象（数组）列表本身），传进迭代器iteratee中，并运行iteratee函数后，返回新的数组列表值。
 
-```python
+```
 for (var index = 0; index < length; index++) {
  	var currentKey = keys ? keys[index] : index;
  	results[index] = iteratee(obj[currentKey], currentKey, obj);
@@ -275,7 +278,7 @@ return results;
 
 例：
 
-```python
+```
 var a = [1,2,3];
 var test1 = _.map(a,function (element,index,list){
 	console.log(element+','+index);
@@ -293,7 +296,7 @@ var test1 = _.map(a,function (element,index,list){
 console.log(test1);//[3, 6, 9]
 ```
 
-```python
+```
 var b = {
 	one:'one1',
 	two:'two2',
@@ -316,21 +319,21 @@ console.log(test2);
 //["one1:one", "two2:two", "three3:three"]
 ```
 
-# 3.  _.reduce和_.reduceRight_.reduce(list, iterator, [memo], [context])
+## 3.  _.reduce和_.reduceRight_.reduce(list, iterator, [memo], [context])
 （_.foldl/_.inject）
 _.reduceRight(list, iteratee, memo, [context])
 （_.foldr）Memo（备忘录）是reduce函数的初始值，reduce的每一步都需要由iterator返回。这个迭代传递4个参数：memo,value 和 迭代的index（或者 key）和最后一个引用的整个 list，最后一个是引用指向整个list。如果reduce的初始调用没有传递memo，iterator将会调用列表中的第一个元素。第一个元素通过memo参数在iterator中调用并传递到列表的下一个元素中。
 reducRight是从右侧开始组合的元素的reduce函数，如果存在JavaScript 1.8版本的reduceRight，则用其代替。Foldr在javascript中不像其它有懒计算的语言那么有用（愚人码头注：lazy evaluation：一种求值策略，只有当表达式的值真正需要时才对表达式进行计算）。
 
-```python
+```
 _.reduce = _.foldl = _.inject = createReduce(1);
 ```
 
-```python
+```
 _.reduceRight = _.foldr = createReduce(-1);
 ```
 
-```python
+```
 var createReduce = function(dir) {
 	var reducer = function(obj, iteratee, memo, initial) {
 		 var keys = !isArrayLike(obj) && _.keys(obj),
@@ -358,12 +361,12 @@ var createReduce = function(dir) {
 2. 运行optimizeCb()函数，且argCount传入的参数值为4，故：
 iteratee得到的值为：
 
-```python
+```
 iteratee = function(accumulator,value, index, collection) {	return func.call(context, accumulator ,value, index, collection);};```
 
 3. 运行reducer()函数，并得到最新的memo值，并返回
 例：
-```python
+```
 var a = [1,2,3,4];
 var test1 = _.reduce(a,function (memo,num,index,list){
 	console.log(memo+','+num+','+index);
@@ -383,7 +386,7 @@ var test1 = _.reduce(a,function (memo,num,index,list){
 console.log(test1);//13
 ```
 
-```python
+```
 var b = [1,2,3,4];
 var test2 = _.reduce(b,function (memo,num,index,list){
 	console.log(memo+','+num+','+index);
@@ -403,7 +406,7 @@ var test2 = _.reduce(b,function (memo,num,index,list){
 console.log(test2);//4
 ```
 
-```python
+```
 var c = {
 	one:'a',
 	two:'b',
@@ -425,7 +428,7 @@ b
 console.log(test3);//c
 ```
 
-```python
+```
 var list2 = [1,2,3,4];
 var test2 = _.reduceRight(list2,function (memo,data,rightIndex,list){
 	console.log( memo );
@@ -455,12 +458,12 @@ var test2 = _.reduceRight(list2,function (memo,data,rightIndex,list){
 console.log(test2);// [4, 4, 3, 2, 1]
 ```
 
-＃ 4. _.find
+## 4. _.find
 
 _.find(list, predicate, [context])（_.detect）
 在list中逐项查找，返回第一个通过predicate迭代函数真值检测的元素值，如果没有值传递给测试迭代器将返回undefined，如果找到匹配的元素，函数将立即返回，不会遍历整个list。
 
-```python
+```
 _.find = _.detect = function(obj, predicate, context) {
     var key;
     if (isArrayLike(obj)) {
@@ -482,11 +485,11 @@ _.find = _.detect = function(obj, predicate, context) {
 4. 其中：
 1) _.findIndex()
 
-```python
+```
 _.findIndex = createPredicateIndexFinder(1);
 ```
 
-```python
+```
 var createPredicateIndexFinder = function(dir) {
   return function(array, predicate, context) {
     predicate = cb(predicate, context);
@@ -502,14 +505,14 @@ var createPredicateIndexFinder = function(dir) {
 
 a. 运行cb()函数，得到迭代函数predicate()的值
 
-```python
-predicate=optimizeCb(value,context);			=function(value, index, collection) {      			return func.call(context, value, index, collection);   		};
+```
+predicate=optimizeCb(predicate,context);			=function(value, index, collection) {      			return predicate.call(context, value, index, collection);   		};
 ```
 
 b. index从0开始进行for循环，当满足迭代函数predicate的条件时，直接返回index（索引位置），若遍历完列表后，没有满足迭代函数predicate条件，则返回-1
 2) _.findKey()
 
-```python
+```
 _.findKey = function(obj, predicate, context) {
   predicate = cb(predicate, context);
   var keys = _.keys(obj), key;
@@ -522,14 +525,14 @@ _.findKey = function(obj, predicate, context) {
 
 a. 运行cb()函数，得到predicate的值
 
-```pythonpredicate=optimizeCb(value,context);			=function(value, index, collection) {      			return func.call(context, value, index, collection);   		};
+```predicate=optimizeCb(predicate,context);			=function(value, index, collection) {      			return predicate.call(context, value, index, collection);   		};
 ```
 
 b. 检索object拥有的所有可枚举属性的名称，并返回数组keys。
 c. index从0开始进行for循环，遍历obj的各个属性，并把属性名称值赋给key，当满足迭代函数predicate的条件时，直接返回key（属性名称值），若遍历完列表后，没有满足迭代函数predicate条件，则返回undefined。
 例：
 
-```python
+```
 var list = [1, 2, 3, 4, 5, 6];
 var test1 = _.find(list,function (data,index,list){
 	console.log( data +','+ index );
@@ -543,7 +546,7 @@ var test1 = _.find(list,function (data,index,list){
 console.log(test1);// 3
 ```
 
-```python
+```
 var list2 = {
 	one:'a',
 	two:'b',
@@ -560,12 +563,12 @@ b,two
 console.log(test2);// b
 ```
 
-# 5. _.filter
+## 5. _.filter
 
 _.filter(list, predicate, [context])（_.select）
 遍历list中的每个值，返回包含所有通过predicate迭代函数真值检测的元素值。（愚人码头注：如果存在原生filter方法，则用原生的filter方法。）
 
-```python
+```
 _.filter = _.select = function(obj, predicate, context) {
   var results = [];
   predicate = cb(predicate, context);
@@ -578,14 +581,14 @@ _.filter = _.select = function(obj, predicate, context) {
 
 1. 运行cb()函数，并得到迭代函数predicate()的值:
 
-```python
-predicate=optimizeCb(value,context);			=function(value, index, collection) {      			return func.call(context, value, index, collection);   		};
+```
+predicate=optimizeCb(predicate,context);			=function(value, index, collection) {      			return predicate.call(context, value, index, collection);   		};
 ```
 
 2. 运行_.each()函数，遍历obj对象，并判断是否满足迭代函数predicate的条件，满足，则把相应的值推进数组results中，不满足，则继续遍历，直到遍历完成为止，并返回results数组。
 例：
 
-```python
+```
 var list = [1, 2, 3, 4, 5, 6];
 var test1 = _.filter(list,function (data,index,list){
 	console.log( data +','+ index );
@@ -602,7 +605,7 @@ var test1 = _.filter(list,function (data,index,list){
 console.log(test1);// [2, 4, 6]
 ```
 
-```python
+```
 var list2 = {
 	one:'a',
 	two:'b',
@@ -618,12 +621,12 @@ var test2 = _.filter(list2,function (data,key,list){
 console.log(test2);// ["a", "e", "g"]
 ```
 
-# 6. _.reject
+## 6. _.reject
 
 _.reject(list, predicate, [context])
 返回list中没有通过predicate真值检测的元素集合，与filter相反
 
-```python
+```
 _.reject = function(obj, predicate, context) {
   // negate_.negate(predicate) (对立面；反面)
   // 返回一个新的predicate函数的否定版本。
@@ -633,13 +636,13 @@ _.reject = function(obj, predicate, context) {
 
 1. 运行cb()函数，并得到迭代函数predicate()的值:
 
-```python
-predicate=optimizeCb(value,context);			=function(value, index, collection) {      			return func.call(context, value, index, collection);   		};
+```
+predicate=optimizeCb(predicate,context);			=function(value, index, collection) {      			return predicate.call(context, value, index, collection);   		};
 ```
 
 2. 运行_.negate()函数，通过！非运算符，返回一个新的迭代函数predicate()的否定版本。
 
-```python
+```
 _.negate = function(predicate) {
   return function() {
     return !predicate.apply(this, arguments);
@@ -649,7 +652,7 @@ _.negate = function(predicate) {
 
 例：
 
-```python
+```
 var list = [1, 2, 3, 4, 5, 6];
 var test1 = _.reject(list,function (data,index,list){
 	console.log( data +','+ index );
@@ -666,7 +669,7 @@ var test1 = _.reject(list,function (data,index,list){
 console.log(test1);// [1, 3, 5]
 ```
 
-```python
+```
 var list2 = {
 	one:'a',
 	two:'b',
@@ -680,12 +683,12 @@ var test2 = _.reject(list2,function (data,key,list){
 	return key == 'one' || key=='five' || key=='seven';
 });
 console.log(test2);// ["b", "c", "d", "f"]
-```# 7. _.every
+```## 7. _.every
 
 _.every(list, [predicate], [context])（_.all）
 如果list中的所有元素都通过predicate的真值检测就返回true。
 
-```python
+```
 _.every = _.all = function(obj, predicate, context) {
   predicate = cb(predicate, context);
   var keys = !isArrayLike(obj) && _.keys(obj),
@@ -700,15 +703,15 @@ _.every = _.all = function(obj, predicate, context) {
 
 1. 运行cb()函数，并得到迭代函数predicate()的值:
 
-```python
-predicate=optimizeCb(value,context);			=function(value, index, collection) {      			return func.call(context, value, index, collection);   		};
+```
+predicate=optimizeCb(predicate,context);			=function(value, index, collection) {      			return predicate.call(context, value, index, collection);   		};
 ```
 
 2. 判断obj是对象还是数组，若是对象，检索object拥有的所有可枚举属性的名称，并返回数组keys。
 3. 使用for循环，判断迭代函数 predicate()的条件，当有一条数据不满足条件时，返回false，当所有数据满足条件时，返回true。
 例：
 
-```python
+```
 var list = [2, 4, 6, 8, 10, 12];
 var test1 = _.every(list,function (data,index,list){
 	return data % 2 == 0;
@@ -716,7 +719,7 @@ var test1 = _.every(list,function (data,index,list){
 console.log(test1);// true
 ```
 
-```python
+```
 var list2 = {
 	one:'a',
 	two:'b',
@@ -734,12 +737,12 @@ b
 console.log(test2);// false
 ```
 
-# 8. _.some
+## 8. _.some
 
 _.some(list, [predicate], [context])（_.any）
 如果list中有任何一个元素通过 predicate 的真值检测就返回true。一旦找到了符合条件的元素, 就直接中断对list的遍历。
 
-```python
+```
 _.some = _.any = function(obj, predicate, context) {
   predicate = cb(predicate, context);
   var keys = !isArrayLike(obj) && _.keys(obj),
@@ -754,15 +757,15 @@ _.some = _.any = function(obj, predicate, context) {
 
 1. 运行cb()函数，并得到迭代函数predicate()的值:
 
-```python
-predicate=optimizeCb(value,context);			=function(value, index, collection) {      			return func.call(context, value, index, collection);   		};
+```
+predicate=optimizeCb(predicate,context);			=function(value, index, collection) {      			return predicate.call(context, value, index, collection);   		};
 ```
 
 2. 判断obj是对象还是数组，若是对象，检索object拥有的所有可枚举属性的名称，并返回数组keys。
 3. 使用for循环，判断迭代函数 predicate()的条件，当有一条数据满足条件时，返回true，当所有数据不满足条件时，返回false。与_.every()函数相反。
 例：
 
-```python
+```
 var list = [1, 2, 3, 4, 5, 6];
 var test1 = _.some(list,function (data,index,list){
 	console.log(data);
@@ -775,7 +778,7 @@ var test1 = _.some(list,function (data,index,list){
 console.log(test1);// true
 ```
 
-```python
+```
 var list2 = {
 	one:'a',
 	two:'b',
@@ -793,12 +796,12 @@ b
 console.log(test2);// true
 ```
 
-# 9. _.contains
+## 9. _.contains
 
 _.contains(list, value, [fromIndex])（_.includes/_.include）
 如果list包含指定的value则返回true（愚人码头注：使用===检测）。如果list 是数组，内部使用indexOf判断。使用fromIndex来给定开始检索的索引位置。
 
-```python
+```
 _.contains = _.includes = _.include = function(obj, item, fromIndex, guard) {
   // _.values(object) 
   // 返回object对象所有的属性值。
@@ -819,18 +822,18 @@ _.contains = _.includes = _.include = function(obj, item, fromIndex, guard) {
 3. 运行_.indexOf()函数，并检测返回值是否为-1，若是：返回false，若否：返回true。
 例：
 
-```python
+```
 var list = [2, 4, 6, 8, 10, 12];
 var test1 = _.contains(list,6);
 console.log(test1);// true
 ```
 
-```python
+```
 var test3 = _.contains(list,6,3);
 console.log(test3);// false
 ```
 
-```python
+```
 var list2 = {
 	one:'a',
 	two:'b',
@@ -841,12 +844,12 @@ var test2 = _.contains(list2,'c');
 console.log(test2);// true
 ```
 
-# 10. _.invoke
+## 10. _.invoke
 
 _.invoke(list, methodName, *arguments)
 在list的每个元素上执行methodName方法。任何传递给invoke的额外参数，invoke都会在调用methodName方法的时候传递给它。
 
-```python
+```
 _.invoke = restArgs(function(obj, method, args) {
   var isFunc = _.isFunction(method);
   return _.map(obj, function(value) {
@@ -856,7 +859,7 @@ _.invoke = restArgs(function(obj, method, args) {
 });
 ```
 
-```python
+```
 var restArgs = function(func, startIndex) {
   startIndex = startIndex == null ? func.length - 1 : +startIndex;
   return function() {
@@ -885,18 +888,18 @@ var restArgs = function(func, startIndex) {
 3. 判断func是否为null，若存在，运行func函数并存在参数数组［args］，且作用域是value，若不存在，运行func函数。
 例：
 
-```python
+```
 var list = [[5, 1, 7], [3, 2, 1]];
 var test1 = _.invoke(list,'sort');
 console.log(test1);// [[1,5,7],[1,2,3]]
 ```
 
-# 11. _.pluck
+## 11. _.pluck
 
 _.pluck (list, propertyName)
 pluck也许是map最常使用的用例模型的简化版本，即萃取数组对象中某属性值，返回一个数组。
 
-```python
+```
 _.pluck = function(obj, key) {
   return _.map(obj, _.property(key));
 };
@@ -904,7 +907,7 @@ _.pluck = function(obj, key) {
 
 1. 运行_.property函数，返回一个函数，这个函数返回任何传入的对象的key属性值obj(key):_.property= property (key); 
 
-```python
+```
 var property = function(key) {
   return function(obj) {
     return obj == null ? void 0 : obj[key];
@@ -916,7 +919,7 @@ _.property = property;
 
 即：
 
-```python
+```
 _.pluck = _.map(obj,function(key){
 	return function(obj){
 		return obj == null ? void 0 : obj[key];
@@ -927,7 +930,7 @@ _.pluck = _.map(obj,function(objChild ,key){
 }
 ```
 
-2. 运行_.map()函数，并得到返回值为obj属性值数组。例：```python
+2. 运行_.map()函数，并得到返回值为obj属性值数组。例：```
 var list =  [
 	{name: 'moe', age: 40}, 
 	{name: 'larry', age: 50}, 
@@ -937,12 +940,12 @@ var test1 = _.pluck(list,'name');
 console.log(test1);// ["moe", "larry", "curly"]
 ```
 
-# 12. _.where
+## 12. _.where
 
 _.where (list, properties)
 遍历list中的每一个值，返回一个数组，这个数组包含properties所列出的属性的所有的 键 - 值对。
 
-```python
+```
 _.where = function(obj, attrs) {
   return _.filter(obj, _.matcher(attrs));
 };
@@ -950,7 +953,7 @@ _.where = function(obj, attrs) {
 
 1. 运行_.matcher()函数，返回一个函数（断言函数），这个函数会给你一个断言可以用来辨别给定的对象是否匹配attrs指定键/值属性。
 
-```python
+```
 _.matcher = _.matches = function(attrs) {
   // _.extendOwn(destination, *sources) Alias: assign 
   // 类似于 extend, 但复制source对象中自己的属性覆盖到destination目标对象。
@@ -968,7 +971,7 @@ _.matcher = _.matches = function(attrs) {
 
 即：
 
-```python
+```
 _.where = _.filter(obj,function(attrs){
 	attrs = _.extendOwn({}, attrs);
 	return function(obj){
@@ -980,7 +983,7 @@ _.where = _.filter(obj,function(attrs){
 2. 运行_.filter()函数，遍历obj中的每个值，返回包含所有通过function(attrs)迭代函数真值检测的元素值。
 例：
 
-```python
+```
 var listOfPlays = [
 	{title: 'Cymbeline', author: 'Shakespeare', year: 1611},
 	{title: 'The Tempest',author: 'Shakespeare', },
@@ -1005,18 +1008,18 @@ console.log(list);
 */
 ```
 
-# 13. _.findWhere 
+## 13. _.findWhere 
 
 _.findWhere (list, properties)
 遍历整个list，返回匹配 properties参数所列出的所有 键 - 值 对的第一个值。如果没有找到匹配的属性，或者list是空的，那么将返回undefined。
 
-```python
+```
 _.findWhere = function(obj, attrs) {
   return _.find(obj, _.matcher(attrs));
 };
 ```
 
-1. 运行_.matcher()函数，返回一个函数（断言函数），这个函数会给你一个断言可以用来辨别给定的对象是否匹配attrs指定键/值属性.即：```python
+1. 运行_.matcher()函数，返回一个函数（断言函数），这个函数会给你一个断言可以用来辨别给定的对象是否匹配attrs指定键/值属性.即：```
 _.findWhere = _.find(obj,function(attrs){
 	attrs = _.extendOwn({}, attrs);
 	return function(obj){
@@ -1025,7 +1028,7 @@ _.findWhere = _.find(obj,function(attrs){
 });
 ```
 
-2. 运行_.find()函数，在obj中逐项查找，返回第一个通过function(attrs)迭代函数真值检测的元素值，如果没有值传递给测试迭代器将返回undefined，如果找到匹配的元素，函数将立即返回，不会遍历整个obj。例：```python
+2. 运行_.find()函数，在obj中逐项查找，返回第一个通过function(attrs)迭代函数真值检测的元素值，如果没有值传递给测试迭代器将返回undefined，如果找到匹配的元素，函数将立即返回，不会遍历整个obj。例：```
 var publicServicePulitzers = [
 	{year: 1348, reason: "For its public service in publishing."},
 	{year: 1918,newsroom: "The New York Times",reason: "For its public"},
@@ -1042,7 +1045,591 @@ Object {
 	reason: "For its public"
 }
 */
-```		
+```
+
+## 14. _.max
+
+_.max(list, [iteratee], [context])
+返回list中的最大值。如果传递iteratee参数，iteratee将作为list中每个值的排序依据。如果list为空，将返回-Infinity，所以你可能需要事先用isEmpty检查 list 。
+
+```
+_.max = function(obj, iteratee, context) {
+  var result = -Infinity, lastComputed = -Infinity,
+      value, computed;
+  if (iteratee == null || (typeof iteratee == 'number' && typeof obj[0] != 'object') && obj != null) {
+  	//_.values(object) 
+  	//返回object对象所有的属性值。
+    obj = isArrayLike(obj) ? obj : _.values(obj);
+    for (var i = 0, length = obj.length; i < length; i++) {
+      value = obj[i];
+      if (value != null && value > result) {
+        result = value;
+      }
+    }
+  } else {
+    iteratee = cb(iteratee, context);
+    _.each(obj, function(v, index, list) {
+      computed = iteratee(v, index, list);
+      if (computed > lastComputed || computed === -Infinity && result === -Infinity) {
+        result = v;
+        lastComputed = computed;
+      }
+    });
+  }
+  return result;
+};
+```
+
+1. 判断迭代器iteratee是否为null或判断迭代器iteratee的类型为”number”、obj[0]的类型不为“object”，obj不为null。
+若是:
+a) 首先判断obj是否为数组，是，则直接吧obj赋值给obj，否，则运行_.values(obj)函数,返回obj对象所有的属性值,并返回一个数组，赋值给obj。
+b) 通过for循环，遍历新对象obj的每一个值，并赋值给value，判断value不为null，且value > result则把value赋值给result，直到找到最大值为止。并返回result值。
+例：
+
+```
+var list2 = [3,45,23,67,43,21];
+var test2 = _.max(list2);
+console.log(test2);//67
+```
+
+```
+var list3 = {
+	age1:'34',
+	age2:'42',
+	age3:'56',
+	age4:'43',
+	age5:'35'
+};
+var test3 = _.max(list3);
+console.log(test3);//56
+```
+
+2. 若否：
+a) 运行cb()函数，并得到迭代函数iteratee()的值:
+
+```
+iteratee=optimizeCb(iteratee,context);			=function(value, index, collection) {      			return iteratee.call(context, value, index, collection);   		};
+```
+
+b) 运行迭代函数iteratee，并把返回值赋值给computed。
+c) 运行_.each()函数，遍历obj。判断computed > lastComputed 或computed完全等于负无穷，result完全等于负无穷，则把v的值赋给result，把computed的值赋给lastComputed。直到找到computed的最大值为止，并返回result值。
+例：
+
+```
+var list = [
+	{name: 'moe', age: 40}, 
+	{name: 'larry', age: 70}, 
+	{name: 'curly', age: 60}
+];
+var test = _.max(list,function(value){
+	return value.age;
+});
+console.log(test);//Object{name: 'larry', age: 70}
+```
+
+## 15. _.min
+
+_.min(list, [iteratee], [context]) 
+返回list中的最小值。如果传递iteratee参数，iteratee将作为list中每个值的排序依据。如果list为空，将返回-Infinity，所以你可能需要事先用isEmpty检查 list 。
+
+```
+_.min = function(obj, iteratee, context) {
+  var result = Infinity, lastComputed = Infinity,
+      value, computed;
+  if (iteratee == null || (typeof iteratee == 'number' && typeof obj[0] != 'object') && obj != null) {
+    obj = isArrayLike(obj) ? obj : _.values(obj);
+    for (var i = 0, length = obj.length; i < length; i++) {
+      value = obj[i];
+      if (value != null && value < result) {
+        result = value;
+      }
+    }
+  } else {
+    iteratee = cb(iteratee, context);
+    _.each(obj, function(v, index, list) {
+      computed = iteratee(v, index, list);
+      if (computed < lastComputed || computed === Infinity && result === Infinity) {
+        result = v;
+        lastComputed = computed;
+      }
+    });
+  }
+  return result;
+};
+```
+
+1. 判断迭代器iteratee是否为null或判断迭代器iteratee的类型为”number”、obj[0]的类型不为“object”，obj不为null。
+若是:
+a) 首先判断obj是否为数组，是，则直接吧obj赋值给obj，否，则运行_.values(obj)函数,返回obj对象所有的属性值,并返回一个数组，赋值给obj。
+b) 通过for循环，遍历新对象obj的每一个值，并赋值给value，判断value不为null，且value < result则把value赋值给result，直到找到最小值为止。并返回result值。
+例：
+
+```
+var list2 = [3,45,23,67,43,21];
+var test2 = _.min(list2);
+console.log(test2);//3
+```
+
+```
+var list3 = {
+	age1:'34',
+	age2:'42',
+	age3:'56',
+	age4:'43',
+	age5:'35'
+};
+var test3 = _.min(list3);
+console.log(test3);//34
+```
+
+2. 若否：
+a) 运行cb()函数，并得到迭代函数iteratee()的值:
+
+```
+iteratee=optimizeCb(iteratee,context);			=function(value, index, collection) {      			return iteratee.call(context, value, index, collection);   		};
+```
+
+b) 运行迭代函数iteratee，并把返回值赋值给computed。
+c) 运行_.each()函数，遍历obj。判断computed < lastComputed 或computed完全等于正无穷，result完全等于正无穷，则把v的值赋给result，把computed的值赋给lastComputed。直到找到computed的最小值为止，并返回result值。
+例：
+
+```
+var list = [
+	{name: 'moe', age: 40}, 
+	{name: 'larry', age: 70}, 
+	{name: 'curly', age: 60}
+];
+var test = _.min(list,function(value){
+	return value.age;
+});
+console.log(test);//Object{name: 'moe', age: 40}
+```
+
+## 16. _.sample
+
+_.sample(list, [n]) 
+从 list中产生一个随机样本。传递一个数字表示从list中返回n个随机元素。否则将返回一个单一的随机项。
+
+```
+_.sample = function(obj, n, guard) {
+  // _.random(min, max) 
+  // 返回一个min 和 max之间的随机整数。
+  // 如果你只传递一个参数，那么将返回0和这个参数之间的整数.
+  if (n == null || guard) {
+    if (!isArrayLike(obj)) obj = _.values(obj);
+    return obj[_.random(obj.length - 1)];
+  }
+  // _.clone(object) 
+  // 创建 一个浅复制（浅拷贝）的克隆object。
+  // 任何嵌套的对象或数组都通过引用拷贝，不是复制。
+  var sample = isArrayLike(obj) ? _.clone(obj) : _.values(obj);
+  var length = getLength(sample);
+  n = Math.max(Math.min(n, length), 0);
+  var last = length - 1;
+  for (var index = 0; index < n; index++) {
+    var rand = _.random(index, last);
+    var temp = sample[index];
+    sample[index] = sample[rand];
+    sample[rand] = temp;
+  }
+  return sample.slice(0, n);
+};
+```
+
+1. 判断n是为null或guard存在。
+a) 则判断obj若不为数组，运行_.values(obj)函数，返回obj对象所有的属性值,并返回一个数组，赋值给obj。
+b) 运行 _.random(obj.length - 1)函数，返回0与obj.length - 1之间的一个随机整数。从而，返回一个obj随机数。
+2. n存在
+a) 判断obj是否为数组，若是，则运行_.clone(obj)，拷贝一份新的数组赋值给sample，若否，则运行 _.values(obj)函数，返回obj对象所有的属性值,并返回一个数组，赋值给sample。
+b) 读取sample的长度，并赋值给length。
+c) 运行Math.min()函数，得出length与n中的最小值，并运行Math.max()函数，得到其最小值与0之间的最大值。
+d) 得出sample最后一个索引值，赋值给last。
+e) 运行for循环函数，遍历n次，运行 _.random(index,last)函数，返回index与last之间的一个随机整数，赋值给rand，相当于一个随机索引值。添加中间变量temp存储sample[index]的值。最后得到sample[index]和sample[rand]的值，并相互交换他们所在的位置，重新得到一个随机数组。
+f) 返回新数组中0至n的值。
+例：
+
+```
+var list = [1, 2, 3, 4, 5, 6];
+var test = _.sample(list);
+console.log(test);//6
+```
+
+```
+var list = [1, 2, 3, 4, 5, 6];
+var test2 = _.sample(list,3);
+console.log(test2);//[6, 5, 4]
+```
+
+```
+var list2 = {
+	one:'a',
+	two:'b',
+	three:'c',
+	four:'d',
+	five:'e'
+};
+var test2 = _.sample(list2);
+console.log(test2);//c
+```
+
+## 17. _.shuffle
+
+_.shuffle(list)
+返回一个随机乱序的 list 副本, 使用 Fisher-Yates shuffle 来进行随机乱序。
+
+```
+_.shuffle = function(obj) {
+  return _.sample(obj, Infinity);
+};
+```
+
+1. 运行次函数_.shuffle()主要与运行 _.sample()函数同理，参数n为Infinity无穷大。故运行后将到一个随机的obj对象。
+例：
+
+```
+var list = [1, 2, 3, 4, 5, 6];
+var test = _.shuffle(list);
+console.log(test);//[1, 5, 4, 2, 6, 3]
+```
+
+```
+var list2 = {
+	one:'a',
+	two:'b',
+	three:'c',
+	four:'d',
+	five:'e'
+};
+var test2 = _.shuffle(list2);
+console.log(test2);//["c", "b", "e", "d", "a"]
+```
+
+## 18. _.sortBy
+
+_.sortBy(list, iteratee, [context]) 
+返回一个排序后的list拷贝副本。如果传递iteratee参数，iteratee将作为list中每个值的排序依据。迭代器也可以是字符串的属性的名称进行排序的(比如 length)。
+
+```
+_.sortBy = function(obj, iteratee, context) {
+  var index = 0;
+  iteratee = cb(iteratee, context);
+  // _.pluck(list, propertyName)
+  // pluck也许是map最常使用的用例模型的简化版本，
+  // 即萃取数组对象中某属性值，返回一个数组。
+  return _.pluck(_.map(obj, function(value, key, list) {
+    return {
+      value: value,
+      index: index++,
+      criteria: iteratee(value, key, list)
+    };
+  }).sort(function(left, right) {
+    // arrayobj.sort(sortfunction)  
+    // 返回一个元素已经进行了排序的 Array 对象。 
+    // arrayObj 必选项。任意 Array 对象。  
+    // sortFunction 可选项。是用来确定元素顺序的函数的名称。
+    // 如果这个参数被省略，那么元素将按照 ASCII 字符顺序进行升序排列。  
+    // 如果为 sortfunction 参数提供了一个函数，那么该函数必须返回下列值之一：
+    // 负值，如果所传递的第一个参数比第二个参数小。
+    // 零，如果两个参数相等。  
+    // 正值，如果第一个参数比第二个参数大。
+    var a = left.criteria;
+    var b = right.criteria;
+    if (a !== b) {
+      if (a > b || a === void 0) return 1;	//降序排列
+      if (a < b || b === void 0) return -1;	//升序排列
+    }
+    return left.index - right.index;
+  }), 'value');
+};
+```
+
+1. 运行cb()函数，
+a) 若iteratee为迭代函数则:
+
+```
+iteratee=optimizeCb(iteratee,context);			=function(value, index, collection) {      			return iteratee.call(context, value, index, collection);   		};
+```
+
+b) 若iteratee为字符串或null，则
+
+```
+iteratee=_.property(iteratee);			=function(iteratee) {      			return function(obj) {
+					   return obj == null ? void 0 : obj[iteratee];
+					};   		};
+```
+
+2. 运行_.map()函数，返回一个新的数组，并运行sort()函数，对此数组按照一定规则进行排序。得到新的数组。
+3. 运行_.pluck()函数，返回最终得到的数组。
+例：
+
+```
+var list = [
+	{name: 'moe', age: 40}, 
+	{name: 'larry', age: 70}, 
+	{name: 'curly', age: 60}
+];
+var test = _.sortBy(list,'name');
+console.log(test);
+/*
+[
+	{name: 'curly', age: 60}, 
+	{name: 'larry', age: 70}, 
+	{name: 'moe', age: 40}
+];
+*/
+var test4 = _.sortBy(list,'age');
+console.log(test4);
+/*
+[ 
+	{name: 'moe', age: 40},
+	{name: 'curly', age: 60}, 
+	{name: 'larry', age: 70}
+];
+*/
+```
+
+```
+var list2 = [3,45,23,67,43,21];
+var test2 = _.sortBy(list2,function(num){ 
+	//Math.sin(x)  
+	//x 的正玄值。返回值在 -1.0 到 1.0 之间；
+	return Math.sin(num); 
+});
+console.log(test2);//[67, 23, 43, 3, 21, 45]
+```
+
+```
+var list3 = {
+	age1:'34',
+	age2:'42',
+	age3:'56',
+	age4:'43',
+	age5:'35'
+};
+var test3 = _.sortBy(list3);
+console.log(test3);//["34", "35", "42", "43", "56"]
+```
+
+## 19. _.groupBy
+
+_.groupBy(list, iteratee, [context]) 
+把一个集合分组为多个集合，通过 iterator 返回的结果进行分组。如果 iterator 是一个字符串而不是函数, 那么将使用 iterator 作为各元素的属性名来对比进行分组。
+
+```
+_.groupBy = group(function(result, value, key) {
+  if (_.has(result, key)) result[key].push(value);
+  else result[key] = [value];
+});
+```
+
+1. 运行group()函数
+
+```
+var group = function(behavior, partition) {
+  return function(obj, iteratee, context) {
+    var result = partition ? [[], []] : {};
+    iteratee = cb(iteratee, context);
+    _.each(obj, function(value, index) {
+      var key = iteratee(value, index, obj);
+      behavior(result, value, key);
+    });
+    return result;
+  };
+};
+```
+
+2. 得到behavior的值为
+
+```
+behavior=function(result, value, key) {
+  if (_.has(result, key)) result[key].push(value);
+  else result[key] = [value];
+}
+```
+
+3. 判断partition是否存在，若存在，则result=[[], []]，若不存在，则result={}。
+4. 运行cb()函数，
+a) 若iteratee为迭代函数则:
+
+```
+iteratee=optimizeCb(iteratee,context);			=function(value, index, collection) {      			return iteratee.call(context, value, index, collection);   		};
+```
+
+b) 若iteratee为字符串或null，则
+
+```
+iteratee=_.property(iteratee);			=function(iteratee) {      			return function(obj) {
+					   return obj == null ? void 0 : obj[iteratee];
+					};   		};
+```
+
+5. 运行_.each()函数，遍历obj对象。得到key的值。
+6. 运行behavior()函数
+a) 运行_.has(result, key)函数，判断对象result是否包含给定的键key。若result存在key，则把当前value值push到result[key]中；
+b) 若result不存在key，则直接把value存到数组中并赋给result[key]；
+7. 返回result的最终结果。
+例：
+
+```
+var list = [
+	{name: 'moe', age: 40}, 
+	{name: 'larry', age: 40}, 
+	{name: 'curly', age: 60}
+];
+var test = _.groupBy(list,'age');
+console.log(test);
+/*
+{
+	40:[
+		{name: 'moe', age: 40}, 
+		{name: 'larry', age: 40}
+	],
+	60:[
+		{name: 'curly', age: 60}
+	]
+};
+*/
+```
+
+```
+var list2 = [1.3, 2.1, 2.4];
+var test2 = _.groupBy(list2,function(num){ 
+	//Math.floor(x)  
+	//返回小于等于x的最大整数
+	return Math.floor(num); 
+});
+console.log(test2);
+/*
+{
+	1:[1.3],
+	2:[2.1,2.4]
+}
+*/
+```
+
+## 20. _.indexBy
+
+_.indexBy(list, iteratee, [context])  
+给定一个list，和 一个用来返回一个在列表中的每个元素键 的iterator 函数（或属性名），返回一个每一项索引的对象。和groupBy非常像，但是当你知道你的键是唯一的时候可以使用indexBy 。
+
+```
+_.indexBy = group(function(result, value, key) {
+  result[key] = value;
+});
+```
+
+1. 与_.groupBy()函数一样，先运行group()函数
+2. 得到behavior的值为
+
+```
+behavior=function(result, value, key) {
+  result[key] = value;
+}
+```
+
+3. 直接返回result的最终结果。
+4. 此处与_.groupBy()函数最大的区别是， _.indexBy()函数中迭代函数iteratee得到的键值是唯一的，返回的result[key]结果为一个对象。而 _.groupBy()函数中迭代函数iteratee得到的键值不是唯一的，返回的result[key]结果为一个数组。
+例：
+
+```
+var list = [
+	{name: 'moe', age: 40}, 
+	{name: 'larry', age: 70}, 
+	{name: 'curly', age: 60}
+];
+var test = _.indexBy(list,'age');
+console.log(test);
+/*
+{
+	40:{name: 'moe', age: 40}, 
+	60:{name: 'curly', age: 60},
+	70:{name: 'larry', age: 70}
+};
+*/
+```
+
+```
+var list2 = [1.3, 2.1, 3.4];
+var test2 = _.indexBy(list2,function(num){ 
+	//Math.floor(x)  
+	//返回小于等于x的最大整数
+	return Math.floor(num); 
+});
+console.log(test2);
+/*
+{
+	1:1.3,
+	2:2.1,
+	3:3.4
+}
+*/
+```
+
+## 21. _.countBy
+
+_.countBy(list, iteratee, [context])
+排序一个列表组成一个组，并且返回各组中的对象的数量的计数。类似groupBy，但是不是返回列表的值，而是返回在该组中值的数目。
+
+```
+_.countBy = group(function(result, value, key) {
+  if (_.has(result, key)) result[key]++; 
+  else result[key] = 1;
+});
+```
+
+1. 与_.groupBy()函数一样，先运行group()函数
+2. 得到behavior的值为
+
+```
+behavior=function(result, value, key) {
+  if (_.has(result, key)) result[key]++; 
+  else result[key] = 1;
+}
+```
+
+3. 运行behavior()函数
+a) 运行 _.has(result, key)函数，判断对象result是否包含给定的键key。若result存在key，则result[key]++；
+b) 若result不存在key，则result[key]=1；
+4. 返回result的最终结果。
+5. 此处与_.groupBy()函数最大的区别是， _.countBy()函数的结果是返回在该组中值的数目，而 _.groupBy()函数的结果是返回列表的值。
+例：
+
+```
+var list = [
+	{name: 'moe', age: 40}, 
+	{name: 'larry', age: 40}, 
+	{name: 'curly', age: 60}
+];
+var test = _.countBy(list,'age');
+console.log(test);//{40: 2, 60: 1};
+```
+
+```
+var list2 = [1.3, 2.1, 2.4];
+var test2 = _.countBy(list2,function(num){ 
+	//Math.floor(x)  
+	//返回小于等于x的最大整数
+	return Math.floor(num); 
+});
+console.log(test2);//{1: 1, 2: 2}
+```
+
+```
+var list3 = [1, 2, 3,4,5];
+var test3 = _.countBy(list3, function(num) {
+  	return num % 2 == 0 ? 'even': 'odd';
+});
+console.log(test3);//{odd: 3, even: 2}
+```
+
+## 22. _.toArray
+
+
+## 23. _.size
+
+
+
+## 24. _.partition		
 
 
 
