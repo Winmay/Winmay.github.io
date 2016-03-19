@@ -68,7 +68,7 @@ var optimizeCb = function(func, context, argCount) {
     // 同时使用apply的好处是可以直接将当前函数的arguments对象作为apply的第二个参数传入
 ```
 
-2. 判断传入的对象obj是否为数组或对象,语句：
+2. 判断传入的对象obj是否为类数组对象或对象,类数组对象是有一个数值length属性和对应非负整数属性的对象,如：{'0':'a', '1':'b', '2':'c', length:3}。语句：
 
 ```
 if (isArrayLike(obj))
@@ -87,6 +87,7 @@ var property = function(key) {
   };
 };
 
+// Math.pow(底数,几次方)
 var MAX_ARRAY_INDEX = Math.pow(2, 53) - 1;
 var getLength = property('length');
 var isArrayLike = function(collection) {
@@ -266,7 +267,7 @@ var property = function(key) {
 _.property = property;
 ```
 
-2. 判断obj是对象还是数组，若是对象，检索object拥有的所有可枚举属性的名称，并返回数组keys。3. 使用for循环，遍历keys（index）并返回它们的值（obj的属性或数组值），并求出三个值：obj[keys[i]／i]（obj对象属性（数组索引）对应的值）、keys[i]／i（obj对象对应的属性名称（数组对应的索引））、obj（obj对象（数组）列表本身），传进迭代器iteratee中，并运行iteratee函数后，返回新的数组列表值。
+2. 判断obj是不是类数组对象，检索object拥有的所有可枚举属性的名称，并返回数组keys。3. 使用for循环，遍历keys（index）并返回它们的值（obj的属性或数组值），并求出三个值：obj[keys[i]／i]（obj对象属性（数组索引）对应的值）、keys[i]／i（obj对象对应的属性名称（数组对应的索引））、obj（obj对象（数组）列表本身），传进迭代器iteratee中，并运行iteratee函数后，返回新的数组列表值。
 
 ```
 for (var index = 0; index < length; index++) {
@@ -479,7 +480,7 @@ _.find = _.detect = function(obj, predicate, context) {
 };
 ```
 
-1. 若obj为数组，则执行函数_.findIndex()，此函数类似于_.indexOf，当predicate通过真检查时，返回第一个索引值；否则返回-1。
+1. 若obj为类数组对象，则执行函数_.findIndex()，此函数类似于_.indexOf，当predicate通过真检查时，返回第一个索引值；否则返回-1。
 2. 若obj为对象，则执行函数_.findKey()，此函数类似于_.findIndex，但是检测objects的属性，当predicate通过真检查时，返回属性名称；否则返回undefined。
 3. 若key存在且不等于-1，则返回对象中当前key（属性或索引）的值
 4. 其中：
@@ -707,7 +708,7 @@ _.every = _.all = function(obj, predicate, context) {
 predicate=optimizeCb(predicate,context);			=function(value, index, collection) {      			return predicate.call(context, value, index, collection);   		};
 ```
 
-2. 判断obj是对象还是数组，若是对象，检索object拥有的所有可枚举属性的名称，并返回数组keys。
+2. 判断obj不是类数组对象，检索object拥有的所有可枚举属性的名称，并返回数组keys。
 3. 使用for循环，判断迭代函数 predicate()的条件，当有一条数据不满足条件时，返回false，当所有数据满足条件时，返回true。
 例：
 
@@ -761,7 +762,7 @@ _.some = _.any = function(obj, predicate, context) {
 predicate=optimizeCb(predicate,context);			=function(value, index, collection) {      			return predicate.call(context, value, index, collection);   		};
 ```
 
-2. 判断obj是对象还是数组，若是对象，检索object拥有的所有可枚举属性的名称，并返回数组keys。
+2. 判断obj不是类数组对象，检索object拥有的所有可枚举属性的名称，并返回数组keys。
 3. 使用for循环，判断迭代函数 predicate()的条件，当有一条数据满足条件时，返回true，当所有数据不满足条件时，返回false。与_.every()函数相反。
 例：
 
@@ -1082,7 +1083,7 @@ _.max = function(obj, iteratee, context) {
 
 1. 判断迭代器iteratee是否为null或判断迭代器iteratee的类型为”number”、obj[0]的类型不为“object”，obj不为null。
 若是:
-a) 首先判断obj是否为数组，是，则直接吧obj赋值给obj，否，则运行_.values(obj)函数,返回obj对象所有的属性值,并返回一个数组，赋值给obj。
+a) 首先判断obj是否为类数组对象，是，则直接吧obj赋值给obj，否，则运行_.values(obj)函数,返回obj对象所有的属性值,并返回一个数组，赋值给obj。
 b) 通过for循环，遍历新对象obj的每一个值，并赋值给value，判断value不为null，且value > result则把value赋值给result，直到找到最大值为止。并返回result值。
 例：
 
@@ -1160,7 +1161,7 @@ _.min = function(obj, iteratee, context) {
 
 1. 判断迭代器iteratee是否为null或判断迭代器iteratee的类型为”number”、obj[0]的类型不为“object”，obj不为null。
 若是:
-a) 首先判断obj是否为数组，是，则直接吧obj赋值给obj，否，则运行_.values(obj)函数,返回obj对象所有的属性值,并返回一个数组，赋值给obj。
+a) 首先判断obj是否为类数组对象，是，则直接吧obj赋值给obj，否，则运行_.values(obj)函数,返回obj对象所有的属性值,并返回一个数组，赋值给obj。
 b) 通过for循环，遍历新对象obj的每一个值，并赋值给value，判断value不为null，且value < result则把value赋值给result，直到找到最小值为止。并返回result值。
 例：
 
@@ -1237,7 +1238,7 @@ _.sample = function(obj, n, guard) {
 ```
 
 1. 判断n是为null或guard存在。
-a) 则判断obj若不为数组，运行_.values(obj)函数，返回obj对象所有的属性值,并返回一个数组，赋值给obj。
+a) 则判断obj若不为类数组对象，运行_.values(obj)函数，返回obj对象所有的属性值,并返回一个数组，赋值给obj。
 b) 运行 _.random(obj.length - 1)函数，返回0与obj.length - 1之间的一个随机整数。从而，返回一个obj随机数。
 2. n存在
 a) 判断obj是否为数组，若是，则运行_.clone(obj)，拷贝一份新的数组赋值给sample，若否，则运行 _.values(obj)函数，返回obj对象所有的属性值,并返回一个数组，赋值给sample。
@@ -1624,12 +1625,162 @@ console.log(test3);//{odd: 3, even: 2}
 
 ## 22. _.toArray
 
+_.toArray(list) 
+把list(任何可以迭代的对象)转换成一个数组，在转换 arguments 对象时非常有用。
+
+```
+// 这个正则按“|”分割，包含三个部分
+// [^\ud800-\udfff] 是普通的 BMP 字符,表示不包含代理对代码点的所有字符
+// [\ud800-\udbff][\udc00-\udfff] 是成对的代理项对,表示合法的代理对的所有字符
+// [\ud800-\udfff] 是未成对的代理项字,表示代理对的代码点（本身不是合法的Unicode字符）
+var reStrSymbol = /[^\ud800-\udfff]|[\ud800-\udbff][\udc00-\udfff]|[\ud800-\udfff]/g;
+_.toArray = function(obj) {
+  if (!obj) return [];
+  if (_.isArray(obj)) return slice.call(obj);
+  if (_.isString(obj)) {
+    // Keep surrogate pair characters together
+    // match() 方法可在字符串内检索指定的值，
+    // 或找到一个或多个正则表达式的匹配。
+    return obj.match(reStrSymbol);
+  }
+  if (isArrayLike(obj)) return _.map(obj);
+  return _.values(obj);
+};
+```
+
+1. 判断obj不存在为null时，直接返回空数组[]。
+2. 判断obj为数组时，直接返回obj。
+例：
+
+```
+var test = (function(){ 
+	return _.toArray(arguments).slice(1); 
+})(1, 2, 3, 4);
+console.log(test);//[2, 3, 4]
+```
+
+```
+var list2 = [1,2,3,4,5,6];
+var test2 = _.toArray(list2);
+console.log(test2);//[1, 2, 3, 4, 5, 6]
+```
+
+3. 判断obj为字符串时，obj运行正则表达式obj.match(reStrSymbol)，并返回个字符串字母组成的数组。
+
+```
+var test4 = _.toArray('hello world!');
+console.log(test4);
+//["h", "e", "l", "l", "o", " ", "w", "o", "r", "l", "d", "!"]
+```
+
+4. 判断obj为类数组对象时，运行_.map(obj)函数，并返回数组。
+
+```
+var list5 = {
+	0:'a',
+	1:'b',
+	2:'c',
+	3:'d',
+	length:4
+};
+var test5 = _.toArray(list5);
+console.log(test5);//["a", "b", "c", "d"]
+```
+
+5. 判断obj为对象时,运行_.values(obj)函数，返回obj对象所有的属性值。
+
+```
+var list3 = {
+	one:'a',
+	two:'b',
+	three:'c',
+	four:'d'
+};
+var test3 = _.toArray(list3);
+```
 
 ## 23. _.size
 
+_.size(list) 
+返回list的长度。
 
+```
+_.size = function(obj) {
+  if (obj == null) return 0;
+  return isArrayLike(obj) ? obj.length : _.keys(obj).length;
+};
+```
 
-## 24. _.partition		
+1. 判断obj为null，则返回0。
+2. 判断obj为类数组对象，返回对象的长度。
+例：
+
+```
+var list = [1,2,3,4,5,6];
+var test = _.size(list);
+console.log(test);//6
+```
+
+3. 判断obj为对象，运行_.keys(obj)函数，得到obj对象的属性名称，并返回此数组的长度。
+例：
+
+```
+var list2 = {
+	one:'a',
+	two:'b',
+	three:'c',
+	four:'d'
+};
+var test2 = _.size(list2);
+console.log(test2);//4
+```
+
+## 24. _.partition
+
+_.partition(array, predicate) 
+拆分一个数组（array）为两个数组：第一个数组其元素都满足predicate迭代函数，而第二个的所有元素均不能满足predicate迭代函数。
+
+```
+_.partition = group(function(result, value, pass) {
+	result[pass ? 0 : 1].push(value);
+}, true);
+```
+
+1. 运行group()函数，得到behavior的值为
+
+```
+behavior=function(result, value, pass) {
+ result[pass ? 0 : 1].push(value);
+}
+```
+
+2. 由于partition的值为true，故result=[[], []]。
+3. 运行behavior()函数，若满足pass条件，则把obj的值value传入数组索引为0的位置，若不满足pass条件，则把obj的值value传入数组索引为1的位置。
+例：
+
+```
+var list = [1,2,3,4,5,6];
+var test = _.partition(list,function (value){
+	return value % 2 == 0;
+});
+console.log(test);//[[2, 4, 6],[1, 3, 5]]
+```
+
+```
+var list2 = {
+	one:'a',
+	two:'b',
+	three:'c',
+	four:'d'
+};
+var test2 = _.partition(list2,function (value){
+	return value == 'a' || value == 'c';
+});
+console.log(test2);//[['a', 'c'],['b', 'd']]
+```
+
+#数组(Arrays)
+		
 
 
 
