@@ -1795,7 +1795,7 @@ _.first = _.head = _.take = function(array, n, guard) {
 ```
 
 1. 判断array为空时，返回void 0。
-2. 判断n为null或存在guard时，返回数组的第一个元素值。
+2. 判断n为null或存在guard时，返回数组的第一个元素值。guard的存在是为了防止用户继续传入了第三个参数或以上无意义的参数。
 3. 判断array存在且n存在时，运行_.initial()函数，返回数组0～（array.length - n）的元素值。
 例：
 
@@ -1806,6 +1806,9 @@ console.log(test);//3
 
 var test2 = _.first(list,3);
 console.log(test2);//[3, 5, 7]
+
+var test3 = _.first(list,3,5);
+console.log(test3);//3
 ```
 
 ## 2. _.initial
@@ -1959,7 +1962,7 @@ _.flatten = function(array, shallow) {
 3. 运行for循环函数，value等于数组input[i]中的值。
 4. 判断value为类数组对象且value为数组或者为参数对象。
 a)若是，则判断shallow是否为真，若为真，则运行while函数，把数组的下一级中的所有元素都赋值给output，并结束运行flatten()函数，返回output值；若为假，则继续运行flatten()函数，直到output称为一维数组为止。
-b)若否，则判断第三个参数strict为否，则直接把value的值赋给output。
+b)若否，则判断第三个参数strict为否，则直接把value的值赋给output。即，若value的值为对象时，直接把对象赋值给output。
 例：
 
 ```
@@ -1975,6 +1978,19 @@ console.log(test2);//[1, 2, 3, [[4]]]
 var list3 = [5, 6, 7, 8];
 var test3 = _.flatten(list3);
 console.log(test3);//[5, 6, 7, 8]
+```
+
+```
+var list4 = [
+	{one:'a',two:'b'}, 
+	6, 
+	{three:'c'}, 
+	8 , 
+	[1,5,3],
+	[3,[5]]
+];
+var test4 = _.flatten(list4);
+console.log(test4);//[{one:'a',two:'b'}, 6, {three:'c'}, 8, 1, 5, 3, 3, 5]
 ```
 
 ## 6. _.without
@@ -2107,6 +2123,14 @@ var test2 = _.union(list5, list6, list7);
 console.log(test2);//[1, [5,8], 3, 101, 2, 10, [1,7] ]
 ```
 
+```
+var list8 = [1, 2, 3];
+var list9 = {one:'a'};
+var list10 = [2, 1,7];
+var test3 = _.union(list8, list9, list10);
+console.log(test3);//[1, 2 , 3 ,7 ]
+```
+
 ## 9. _.intersection
 
 _.intersection(*arrays) 
@@ -2132,6 +2156,11 @@ _.intersection = function(array) {
   return result;
 };
 ```
+
+1. 先读取arguments参数数组的长度，并赋值给argsLength。
+2. 运行for函数，把每个传入的array的值赋值给item。
+3. 运行_.contains()函数，若result不包含指定的item值，则继续往下运行。
+4. 继续运行for函数，运行_.contains()函数，若array中其中一个item值不存在arguments[j]，则跳出第一层for循环。
 
 
 ## 10. _.difference
