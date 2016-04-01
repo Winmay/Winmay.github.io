@@ -480,8 +480,8 @@ _.find = _.detect = function(obj, predicate, context) {
 };
 ```
 
-1. 若obj为类数组对象，则执行函数_.findIndex()，此函数类似于_.indexOf，当predicate通过真检查时，返回第一个索引值；否则返回-1。
-2. 若obj为对象，则执行函数_.findKey()，此函数类似于_.findIndex，但是检测objects的属性，当predicate通过真检查时，返回属性名称；否则返回undefined。
+1. 若obj为类数组对象，则执行函数 _.findIndex()，此函数类似于 _.indexOf，当predicate通过真检查时，返回第一个索引值；否则返回-1。
+2. 若obj为对象，则执行函数 _.findKey()，此函数类似于 _.findIndex，但是检测objects的属性，当predicate通过真检查时，返回属性名称；否则返回undefined。
 3. 若key存在且不等于-1，则返回对象中当前key（属性或索引）的值
 4. 其中：
 1) _.findIndex()
