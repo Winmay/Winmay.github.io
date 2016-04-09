@@ -269,9 +269,110 @@ Object {0: 0, 1: 1, 2: 1, 3: 2, 4: 3, 5: 5}
 
 ## 5. _.delay
 
+_.delay(function, wait, *arguments) 
+类似setTimeout，等待wait毫秒后调用function。如果传递可选的参数arguments，当函数function执行时， arguments 会作为参数传入。
+
+```
+_.delay = restArgs(function(func, wait, args) {
+  return setTimeout(function() {
+    return func.apply(null, args);
+  }, wait);
+});
+```
+
+1、 运行restArgs()函数，由于function传入了三个参数：func、wait、args，故restArgs()函数中的参数startIndex=2。所以运行返回的函数：
+
+func.call(this, arguments[0], arguments[1], rest);
+
+2、 运行setTimeout()函数，当等待wait毫秒后调用function。
+
+3、 运行func.apply(null, args);
+
+例：
+
+```
+var log = _.bind(console.log, console);
+_.delay(log, 1000, 'logged later');
+//'logged later' 
+```
 
 ## 6. _.defer
 
+_.defer(function, *arguments) 
+延迟调用function直到当前调用栈清空为止，类似使用延时为0的setTimeout方法。对于执行开销大的计算和无阻塞UI线程的HTML渲染时候非常有用。 如果传递arguments参数，当函数function执行时， arguments 会作为参数传入。
+
+```
+_.defer = _.partial(_.delay, _, 1);
+```
+
+1、 运行_.partial()函数，则函数如下：
+
+_.defer = _.delay.apply(this, 1);
+
+2、 运行_.delay()函数。则函数如下：
+
+```
+_.defer = setTimeout(function() {
+    return func.apply(null, args);
+  }, 1);
+```
+
+例：
+
+```
+_.defer(function(){ alert('deferred'); });
+```
 
 ## 7. _.throttle
+
+_.throttle(function, wait, [options]) 
+创建并返回一个像节流阀一样的函数，当重复调用函数的时候，至少每隔 wait毫秒调用一次该函数。对于想控制一些触发频率较高的事件有帮助。（愚人码头注：详见：javascript函数的throttle和debounce）
+
+默认情况下，throttle将在你调用的第一时间尽快执行这个function，并且，如果你在wait周期内调用任意次数的函数，都将尽快的被覆盖。如果你想禁用第一次首先执行的话，传递{leading: false}，还有如果你想禁用最后一次执行的话，传递{trailing: false}。
+
+```
+_.throttle = function(func, wait, options) {
+  var timeout, context, args, result;
+  var previous = 0;
+  if (!options) options = {};
+
+  var later = function() {
+    // _.now() 
+    // 一个优化的方式来获得一个当前时间的整数时间戳。可用于实现定时/动画功能。
+    previous = options.leading === false ? 0 : _.now();
+    timeout = null;
+    result = func.apply(context, args);
+    if (!timeout) context = args = null;
+  };
+
+  var throttled = function() {
+    var now = _.now();
+    if (!previous && options.leading === false) previous = now;
+    var remaining = wait - (now - previous);
+    context = this;
+    args = arguments;
+    if (remaining <= 0 || remaining > wait) {
+      if (timeout) {
+        clearTimeout(timeout);
+        timeout = null;
+      }
+      previous = now;
+      result = func.apply(context, args);
+      if (!timeout) context = args = null;
+    } else if (!timeout && options.trailing !== false) {
+      timeout = setTimeout(later, remaining);
+    }
+    return result;
+  };
+
+  throttled.cancel = function() {
+    clearTimeout(timeout);
+    previous = 0;
+    timeout = context = args = null;
+  };
+
+  return throttled;
+};
+```
+
 
