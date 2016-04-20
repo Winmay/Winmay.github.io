@@ -328,17 +328,20 @@ _.defer(function(){ alert('deferred'); });
 _.throttle(function, wait, [options]) 
 创建并返回一个像节流阀一样的函数，当重复调用函数的时候，至少每隔 wait毫秒调用一次该函数。对于想控制一些触发频率较高的事件有帮助。（愚人码头注：详见：javascript函数的throttle和debounce）
 
-默认情况下，throttle将在你调用的第一时间尽快执行这个function，并且，如果你在wait周期内调用任意次数的函数，都将尽快的被覆盖。如果你想禁用第一次首先执行的话，传递{leading: false}，还有如果你想禁用最后一次执行的话，传递{trailing: false}。
+默认情况下，throttle将在你调用的第一时间尽快执行这个function，并且，如果你在wait周期内调用任意次数的函数，都将尽快的被覆盖。如果你想禁用第一次首先执行（开始边界）的话，传递{leading: false}，还有如果你想禁用最后一次执行（结尾边界）的话，传递{trailing: false}。
 
 ```
 _.throttle = function(func, wait, options) {
   var timeout, context, args, result;
+  // 上次执行时间点
   var previous = 0;
   if (!options) options = {};
 
+  // 延迟执行函数
   var later = function() {
     // _.now() 
     // 一个优化的方式来获得一个当前时间的整数时间戳。可用于实现定时/动画功能。
+    // 若设定了开始边界不执行选项，上次执行时间始终为0
     previous = options.leading === false ? 0 : _.now();
     timeout = null;
     result = func.apply(context, args);
@@ -347,10 +350,14 @@ _.throttle = function(func, wait, options) {
 
   var throttled = function() {
     var now = _.now();
+    // 首次执行时，如果设定了开始边界不执行选项，将上次执行时间设定为当前时间。
     if (!previous && options.leading === false) previous = now;
+    // 延迟执行时间间隔
     var remaining = wait - (now - previous);
     context = this;
     args = arguments;
+    // 延迟时间间隔remaining小于等于0，表示上次执行至此所间隔时间已经超过一个时间窗口
+    // remaining大于时间窗口wait，表示客户端系统时间被调整过
     if (remaining <= 0 || remaining > wait) {
       if (timeout) {
         clearTimeout(timeout);
@@ -359,6 +366,7 @@ _.throttle = function(func, wait, options) {
       previous = now;
       result = func.apply(context, args);
       if (!timeout) context = args = null;
+      //如果延迟执行不存在，且没有设定结尾边界不执行选项
     } else if (!timeout && options.trailing !== false) {
       timeout = setTimeout(later, remaining);
     }
@@ -374,5 +382,353 @@ _.throttle = function(func, wait, options) {
   return throttled;
 };
 ```
+
+1、 定义变量timeout(用于判断计时是否完成)、context(用于作用域的存储)、args(用于传入变量的存储)、result(用于存储函数运行后的结果)。
+
+2、 定义变量previous，设定上次执行时间点，初始值为0。
+
+3、 定义延时执行函数later()。
+
+1) 判断是否禁用第一次首先执行，即options.leading为false，若是，则上次执行时间始终为0。若否，则上次执行时间为新生成的整数时间戳 _.now()。
+
+2) 把变量timeout设置为空null。
+
+3) 使用apply的方法，以context为作用域，args为参数，运行func函数，并把返回的结果存到result中。
+
+4) 判断若timeout为空时，context和args都设置为null。
+
+4、 定义主函数throttled()。
+
+1) 定义变量now，存储当前时间的整数时间戳。
+
+2) 若上次执行时间点为0，且否禁用第一次首先执行，即options.leading为false，则把上次执行时间点设为当前时间的整数时间戳。
+
+3) 设置延迟执行时间间隔remaining。并把this作用域赋给context，arguments参数赋给args。
+
+4) 若延迟时间间隔remaining小于等于0(表示上次执行至此所间隔时间已经超过一个时间窗口)，或remaining大于时间窗口wait(表示客户端系统时间被调整过)
+
+a、 若timeout不为空，则运行clearTimeout()函数，清除计时器setTimeout()，并把timeout设置为空。
+
+b、 把上次执行时间点设为当前时间的整数时间戳。
+
+c、 使用apply的方法，以context为作用域，args为参数，运行func函数，并把返回的结果存到result中。
+
+d、 判断若timeout为空时，context和args都设置为null。
+
+5) 如果延迟执行为空，且没有禁用最后一次执行，则以remaining为时间间隔，执行setTimeout()函数并执行延迟函数later()。
+
+6) 返回结果result。
+
+5、 定义throttled.cancel函数，把运行clearTimeout()函数，清除计时器setTimeout()并对于变量previous、timeout、context、args重新赋初始值。
+
+例：
+
+```
+var updatePosition = function(){
+	console.log(document.body.scrollTop);
+};
+
+//开始滚动时，不输出结果，两秒后才开始输出结果，结束滚动后，经过两秒再次输出结果。
+var throttled = _.throttle(updatePosition, 2000, {leading: false});
+
+//开始滚动时，先输出第一个结果，两秒后继续输出结果，但滚动结束后不输出最后一个结果
+var throttled = _.throttle(updatePosition, 2000, {trailing: false});
+
+//开始滚动时，不输出结果，两秒后才开始输出结果，但滚动结束后不输出最后一个结果
+var throttled = _.throttle(updatePosition, 2000, {leading: false,trailing: false});
+
+//开始滚动时，先输出第一个结果，两秒后继续输出结果，结束滚动后，经过两秒再次输出结果
+var throttled = _.throttle(updatePosition, 2000);
+$(window).scroll(throttled);
+```
+
+## 8. _.debounce
+
+_.debounce(function, wait, [immediate]) 
+返回 function 函数的防反跳版本, 将延迟函数的执行(真正的执行)在函数最后一次调用时刻的 wait 毫秒之后. 对于必须在一些输入（多是一些用户操作）停止到达之后执行的行为有帮助。 例如: 渲染一个Markdown格式的评论预览, 当窗口停止改变大小之后重新计算布局, 等等.
+
+传参 immediate 为 true， debounce会在 wait 时间间隔的开始调用这个函数 。（愚人码头注：并且在 waite 的时间之内，不会再次调用。）在类似不小心点了提交按钮两下而提交了两次的情况下很有用。
+
+```
+_.debounce = function(func, wait, immediate) {
+  var timeout, result;
+
+  var later = function(context, args) {
+    timeout = null;
+    if (args) result = func.apply(context, args);
+  };
+
+  var debounced = restArgs(function(args) {
+    var callNow = immediate && !timeout;
+    if (timeout) clearTimeout(timeout);
+    if (callNow) {
+      timeout = setTimeout(later, wait);
+      result = func.apply(this, args);
+    } else if (!immediate) {
+      // _.delay(function, wait, *arguments) 
+      // 类似setTimeout，等待wait毫秒后调用function。
+      // 如果传递可选的参数arguments，当函数function执行时， 
+      // arguments 会作为参数传入。
+      timeout = _.delay(later, wait, this, args);
+    }
+
+    return result;
+  });
+
+  debounced.cancel = function() {
+    clearTimeout(timeout);
+    timeout = null;
+  };
+
+  return debounced;
+};
+```
+
+1、 定义变量timeout(用于判断计时是否完成)、result(用于存储函数运行后的结果)。
+
+2、 定义延时执行函数later()。
+
+1) 把timeout变量设置为null
+
+2) 若存在args参数，则使用apply的方法，以context为作用域，args为参数，运行func函数，并把返回的结果存到result中。
+
+3、 定义主函数debounced()。
+
+1) 运行restArgs()函数，把传入的args生成数组类型。
+
+2) 定义变量callNow，用于判断是否现在执行。当immediate为true且timeout为空时，callNow为true。
+
+3) 判断timeout存在时，运行clearTimeout()函数，清除计时器setTimeout()。
+
+4) 当callNow为真时，运行setTimeout()函数，把函数添加到栈中。并使用apply的方法，以this为作用域，args为参数，运行func函数，并把返回的结果存到result中。wait毫秒后，运行later函数。
+
+5) 当callNow为假且immediate为假时，运行 _.delay()函数，等待wait毫秒后调用later函数。
+
+6) 定义debounced.cancel函数，把运行clearTimeout()函数，清除计时器setTimeout()并对于变量timeout重新赋初始值null。
+
+例：
+
+```
+var updatePosition = function(){
+	console.log(document.body.scrollTop);
+};
+
+// 滚动鼠标时，不输出任何值，当鼠标停下并过两秒后，输出值。
+// 其中，当鼠标停下后，当两秒内继续滚动鼠标，则重新计算时间。
+var debounce = _.debounce(updatePosition, 2000);
+
+// 当滚动开始时，输出值，当鼠标停下并过两秒后，也不会输出任何值，即只输出一次值。
+var debounce = _.debounce(updatePosition, 2000, true);
+$(window).scroll(debounce);
+```
+
+## 9. _.wrap
+
+_.wrap(function, wrapper)
+将第一个函数 function 封装到函数 wrapper 里面, 并把函数 function 作为第一个参数传给 wrapper. 这样可以让 wrapper 在 function 运行之前和之后 执行代码, 调整参数然后附有条件地执行.
+
+```
+_.wrap = function(func, wrapper) {
+  // _.partial(function, *arguments)
+  // 局部应用一个函数填充在任意个数的 
+  // arguments，不改变其动态this值。和bind方法很相近。
+  // 你可以传递_ 给arguments列表来指定一个不预先填充，但在调用时提供的参数。
+  return _.partial(wrapper, func);
+};
+```
+
+1、 运行 _.partial()函数，即将func函数绑定到wrapper函数中并调用。
+
+例：
+
+```
+var hello = function(name) { 
+	return "hello: " + name; 
+};
+var wrap = _.wrap(hello, function(func) {
+  return "before, " + func("moe") + ", after";
+});
+var test = wrap();
+console.log(test);
+//'before, hello: moe, after'
+```
+
+## 10. _.negate
+
+_.negate(predicate) 
+返回一个新的predicate函数的否定版本
+
+```
+_.negate = function(predicate) {
+  return function() {
+    return !predicate.apply(this, arguments);
+  };
+};
+```
+
+1、 使用apply的方法，以this为作用域，arguments为参数，运行predicate函数后，并返回得到的false值。
+
+```
+var isFalsy = _.negate(Boolean);
+var test = _.find([-2, -1, 0, 1, 2], isFalsy);
+console.log(test);
+//0
+
+var aa = _.negate(function(value){
+	return value % 3 != 0;
+});
+var test2 = _.filter([1, 2, 3, 4, 5, 6], aa);
+console.log(test2);
+//[3, 6]
+```
+
+## 11. _.compose
+
+_.compose(*functions) 
+返回函数集 functions 组合后的复合函数, 也就是一个函数执行完之后把返回的结果再作为参数赋给下一个函数来执行. 以此类推. 在数学里, 把函数 f(), g(), 和 h() 组合起来可以得到复合函数 f(g(h()))。
+
+```
+_.compose = function() {
+  var args = arguments;
+  var start = args.length - 1;
+  return function() {
+    var i = start;
+    var result = args[start].apply(this, arguments);
+    while (i--) result = args[i].call(this, result);
+    return result;
+  };
+};
+```
+
+1、 定义变量args，用于存储functions数组参数。
+
+2、 定义变量start，用于存储第一个开始运行的function位置。
+
+3、 运行function()
+
+1) 定义变量i，用于存储第i个运行的function位置。
+
+2) 定义result，用于存储function的运行结果。
+
+3) 使用apply的方法，以this为作用域，arguments为参数，运行args[start]函数，并把返回的结果赋值给result。
+
+4) 运行while循环函数，以i-- 作为条件，即函数将从右往左运行。使用call的方法，以this为作用域，result为参数，运行args[i]函数，并把返回的结果赋值给result。
+
+5) 运行完毕后，返回result。
+
+例：
+
+```
+var greet    = function(name){ return "hi: " + name; };
+var exclaim  = function(statement){ return statement.toUpperCase() + "!"; };
+var welcome = _.compose(greet, exclaim);
+var text = welcome('moe');
+console.log(text);
+//'hi: MOE!'
+```
+
+## 12. _.after
+
+_.after(count, function) 
+创建一个函数, 只有在运行了 count 次之后才有效果. 在处理同组异步请求返回结果时, 如果你要确保同组里所有异步请求完成之后才 执行这个函数, 这将非常有用。
+
+```
+_.after = function(times, func) {
+  return function() {
+    if (--times < 1) {
+      return func.apply(this, arguments);
+    }
+  };
+};
+```
+
+1、 运行function，先把times的值减1，然后判断times的值是否小于1，若是，使用apply的方法，以this为作用域，arguments为参数，运行func函数，并返回结果。
+
+例：
+
+```
+function a(arg){
+    console.log(arg);
+}
+
+var afterA = _.after(3,a);
+afterA('a');//不调用
+afterA('b');//不调用
+afterA('c');//调用  c
+afterA('d');//调用  d
+```
+
+## 13. _.before
+
+_.before(count, function) 
+创建一个函数,调用不超过count 次。 当count已经达到时，最后一个函数调用的结果将被记住并返回。
+
+```
+_.before = function(times, func) {
+  var memo;
+  return function() {
+    if (--times > 0) {
+      memo = func.apply(this, arguments);
+    }
+    if (times <= 1) func = null;
+    return memo;
+  };
+};
+```
+
+1、 定义memo，永存存储运行结果。
+
+2、 先把times的值减1，然后判断times的值是否大于0，若是，则使用apply的方法，以this为作用域，arguments为参数，运行func函数，并把返回的结果赋值给memo。
+
+3、 判断times是否小于等于1，若是，则把func设置为null
+
+4、 返回memo的值。
+
+例：
+
+```
+function a(arg){
+    console.log(arg);
+}
+
+var beforeA = _.before(3,a);
+beforeA('a');//调用  a
+beforeA('b');//调用  b
+beforeA('c');//不调用
+beforeA('d');//不调用
+```
+
+## 14. _.once
+
+_.once(function) 
+创建一个只能调用一次的函数。重复调用改进的方法也没有效果，只会返回第一次执行时的结果。 作为初始化函数使用时非常有用, 不用再设一个boolean值来检查是否已经初始化完成.
+
+```
+_.once = _.partial(_.before, 2);
+```
+
+1、 运行 _.partial()函数，即将参数2绑定到 _.before函数中并调用。
+
+2、 运行 _.before函数，即 
+
+_.once =  _.before(2, function);
+
+例：
+
+```
+function a(arg){
+    console.log(arg);
+}
+
+var afterA = _.once(a);
+afterA('a');//调用  a
+afterA('b');//不调用
+afterA('c');//不调用
+afterA('d');//不调用
+```
+
+
+
+
 
 
