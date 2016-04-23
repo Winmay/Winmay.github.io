@@ -276,10 +276,48 @@ _.invert = function(obj) {
 例：
 
 ```
-var test = _.pairs({one: 1, two: 2, three: 3});
+var test = _.invert({Moe: "Moses", Larry: "Louis", Curly: "Jerome"});
 console.log(test);
-// [["one", 1], ["two", 2], ["three", 3]]
+// {Moses: "Moe", Louis: "Larry", Jerome: "Curly"};
 ```
 
+## 7. _.functions
+
+_.functions(object)（.methods）
+返回一个对象里所有的方法名, 而且是已经排序的 — 也就是说, 对象里每个方法(属性值是一个函数)的名称.
+
+```
+_.functions = _.methods = function(obj) {
+  var names = [];
+  for (var key in obj) {
+    if (_.isFunction(obj[key])) names.push(key);
+  }
+  return names.sort();
+};
+```
+
+1、 定义空数组names。
+
+2、 运行for in函数，遍历对象中的各属性。
+
+3、 运行_.isFunction()函数，判断obj的值是否为函数类型，若是，则把obj对应的键名push到names中。
+
+4、 运行sort()函数，对names数组的元素进行排序。并返回结果。
+
+例：
+
+```
+var obj = {
+	all:function(){},
+	one:'one',
+	bindAll:function(){},
+	bind:function(){},
+	any:function(){}
+};
+
+var test = _.functions(obj);
+console.log(test);
+// ["all", "any", "bind", "bindAll"]
+```
 
 
