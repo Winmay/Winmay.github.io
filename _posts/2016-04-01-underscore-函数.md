@@ -459,12 +459,12 @@ _.debounce = function(func, wait, immediate) {
   };
 
   var debounced = restArgs(function(args) {
-    var callNow = immediate && !timeout;
     if (timeout) clearTimeout(timeout);
-    if (callNow) {
+    if (immediate) {
+      var callNow = !timeout;
       timeout = setTimeout(later, wait);
-      result = func.apply(this, args);
-    } else if (!immediate) {
+      if (callNow) result = func.apply(this, args);
+    } else {
       // _.delay(function, wait, *arguments) 
       // 类似setTimeout，等待wait毫秒后调用function。
       // 如果传递可选的参数arguments，当函数function执行时， 
@@ -496,15 +496,19 @@ _.debounce = function(func, wait, immediate) {
 
 1) 运行restArgs()函数，把传入的args生成数组类型。
 
-2) 定义变量callNow，用于判断是否现在执行。当immediate为true且timeout为空时，callNow为true。
+2) 判断timeout存在时，运行clearTimeout()函数，清除计时器setTimeout()。
 
-3) 判断timeout存在时，运行clearTimeout()函数，清除计时器setTimeout()。
+3) 当immediate为真时，
 
-4) 当callNow为真时，运行setTimeout()函数，把函数添加到栈中。并使用apply的方法，以this为作用域，args为参数，运行func函数，并把返回的结果存到result中。wait毫秒后，运行later函数。
+a) 定义变量callNow，用于判断是否现在执行，当timeout为空时，callNow为true。
 
-5) 当callNow为假且immediate为假时，运行 _.delay()函数，等待wait毫秒后调用later函数。
+b) 运行setTimeout()函数，把函数添加到栈中。wait毫秒后，运行later函数，此时，later函数中的参数args为undefined。
 
-6) 定义debounced.cancel函数，把运行clearTimeout()函数，清除计时器setTimeout()并对于变量timeout重新赋初始值null。
+c) 判断callNow是否为true，若是，则使用apply的方法，以this为作用域，args为参数，运行func函数，并把返回的结果存到result中。
+
+4) 当immediate为假时，运行 _.delay()函数，等待wait毫秒后调用later函数。
+
+4、 定义debounced.cancel函数，把运行clearTimeout()函数，清除计时器setTimeout()并对于变量timeout重新赋初始值null。
 
 例：
 
@@ -517,7 +521,7 @@ var updatePosition = function(){
 // 其中，当鼠标停下后，当两秒内继续滚动鼠标，则重新计算时间。
 var debounce = _.debounce(updatePosition, 2000);
 
-// 当滚动开始时，输出值，当鼠标停下并过两秒后，也不会输出任何值，即只输出一次值。
+// 当滚动开始时，输出值，当鼠标停下并过两秒后，重新运行滚动鼠标，则立刻输出值。
 var debounce = _.debounce(updatePosition, 2000, true);
 $(window).scroll(debounce);
 ```

@@ -201,7 +201,9 @@ iteratee = cb(iteratee, context);
 即如下图函数所示：
 
 ```
+var builtinIteratee;
 var cb = function(value, context, argCount) {
+	if (_.iteratee !== builtinIteratee) return _.iteratee(value, context);
   // _.identity(value) 返回与传入参数相等的值. 相当于数学里的: f(x) = x,
   // 这个函数看似无用, 但是在Underscore里被用作默认的迭代器iterator.
   if (value == null) return _.identity;
@@ -1714,7 +1716,7 @@ _.toArray = function(obj) {
     // 或找到一个或多个正则表达式的匹配。
     return obj.match(reStrSymbol);
   }
-  if (isArrayLike(obj)) return _.map(obj);
+  if (isArrayLike(obj)) return _.map(obj, _.identity);
   return _.values(obj);
 };
 ```

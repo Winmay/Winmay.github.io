@@ -12,7 +12,7 @@ _.first(array, [n]) Alias: head, take
 
 ```
 _.first = _.head = _.take = function(array, n, guard) {
-  if (array == null) return void 0;
+  if (array == null || array.length < 1) return void 0;
   if (n == null || guard) return array[0];
   return _.initial(array, array.length - n);
 };
@@ -75,7 +75,7 @@ _.last(array, [n])
 
 ```
 _.last = function(array, n, guard) {
-  if (array == null) return void 0;
+  if (array == null || array.length < 1) return void 0;
   if (n == null || guard) return array[array.length - 1];
   return _.rest(array, Math.max(0, array.length - n));
 };
@@ -131,7 +131,7 @@ _.compact(array)
 
 ```
 _.compact = function(array) {
-  return _.filter(array);
+  return _.filter(array, Boolean);
 };
 ```
 
