@@ -442,6 +442,16 @@ var throttled = _.throttle(updatePosition, 2000);
 $(window).scroll(throttled);
 ```
 
+流程图：
+
+![throttle1](media/throttle1.png)
+
+![throttle2](media/throttle2.png)
+
+![throttle3](media/throttle3.png)
+
+![throttle4](media/throttle4.png)
+
 ## 8. _.debounce
 
 _.debounce(function, wait, [immediate]) 
@@ -525,6 +535,12 @@ var debounce = _.debounce(updatePosition, 2000);
 var debounce = _.debounce(updatePosition, 2000, true);
 $(window).scroll(debounce);
 ```
+
+流程图：
+
+![debounce1](media/debounce1.png)
+
+![debounce2](media/debounce2.png)
 
 ## 9. _.wrap
 
