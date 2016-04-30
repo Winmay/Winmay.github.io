@@ -444,13 +444,14 @@ $(window).scroll(throttled);
 
 流程图：
 
-![throttle1](media/throttle1.png)
+![debounce1](/assets/image/debounce1.png)
 
-![throttle2](media/throttle2.png)
 
-![throttle3](media/throttle3.png)
+![throttle2](/assets/image/throttle2.png)
 
-![throttle4](media/throttle4.png)
+![throttle3](/assets/image/throttle3.png)
+
+![throttle4](/assets/image/throttle4.png)
 
 ## 8. _.debounce
 
@@ -538,9 +539,9 @@ $(window).scroll(debounce);
 
 流程图：
 
-![debounce1](media/debounce1.png)
+![debounce1](/assets/image/debounce1.png)
 
-![debounce2](media/debounce2.png)
+![debounce2](/assets/image/debounce2.png)
 
 ## 9. _.wrap
 
