@@ -754,3 +754,33 @@ console.log(test3);
 //false
 ```
 
+## 38. _.isFinite
+
+_.isFinite(number) 
+如果 number 是有限数字（或可转换为有限数字），那么返回 true。否则，如果 number 是 NaN（非数字），或者是正、负无穷大的数，则返回 false。
+
+```
+_.isFinite = function(obj) {
+  return !_.isSymbol(obj) && isFinite(obj) && !isNaN(parseFloat(obj));
+};
+```
+
+1、 首先obj对象不为象征对象Symbol(obj)，然后obj为有限数字（或可转换为有限数字），最后obj运行parseFloat() 函数解析为一个字符串，并返回一个浮点数。若此浮点数不为NaN，则返回true，若不满足上面的任意一个条件，则返回false。
+
+例：
+
+```
+var test = _.isFinite(Infinity);
+console.log(test);
+//false
+
+var test2 = _.isFinite(Math.PI);
+console.log(test2);
+//true
+
+var test3 = _.isFinite(NaN);
+console.log(test3);
+//false
+```
+
+
