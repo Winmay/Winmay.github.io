@@ -444,7 +444,7 @@ $(window).scroll(throttled);
 
 流程图：
 
-![debounce1](/assets/image/debounce1.png)
+![debounce1](/assets/image/throttle1.png)
 
 
 ![throttle2](/assets/image/throttle2.png)
