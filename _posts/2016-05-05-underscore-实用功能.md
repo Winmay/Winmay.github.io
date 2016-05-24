@@ -511,27 +511,368 @@ console.log(test2);
 // "Fabio"
 ```
 
-## 14. _.template
+在underscore中，其把一些常用的函数也添加到wrapper中。
+
+```
+var ArrayProto = Array.prototype;
+
+// 添加所有增减数组函数到wrapper变量。
+_.each(['pop', 'push', 'reverse', 'shift', 'sort', 'splice', 'unshift'], function(name) {
+  var method = ArrayProto[name];
+  _.prototype[name] = function() {
+    var obj = this._wrapped;
+    method.apply(obj, arguments);
+    if ((name === 'shift' || name === 'splice') && obj.length === 0) delete obj[0];
+    return chainResult(this, obj);
+  };
+});
+
+// 添加所有访问数组函数到wrapper变量。
+_.each(['concat', 'join', 'slice'], function(name) {
+  var method = ArrayProto[name];
+  _.prototype[name] = function() {
+    return chainResult(this, method.apply(this._wrapped, arguments));
+  };
+});
+```
+
+1、 pop() 方法用于删除并返回数组的最后一个元素。
+
+2、 push() 方法可向数组的末尾添加一个或多个元素，并返回新的长度。
+
+3、 reverse() 方法用于颠倒数组中元素的顺序。
+
+4、 shift() 方法用于把数组的第一个元素从其中删除，并返回第一个元素的值。
+
+5、 sort() 方法用于对数组的元素进行排序。
+
+6、 splice() 方法可删除从 index 处开始的零个或多个元素，并且用参数列表中声明的一个或多个值来替换那些被删除的元素。
+
+7、 unshift() 方法可向数组的开头添加一个或更多元素，并返回新的长度。
+
+8、 concat() 方法用于连接两个或多个数组。
+
+9、 join() 方法用于把数组中的所有元素放入一个字符串。
+
+10、 slice() 方法可从已有的数组中返回选定的元素。
+
+## 14. _.templateSettings
+
+此为模版符号设置对象，主要用于修改 _.template函数中插入变量的符号。具体举例请看 _.template函数的解释。
+
+```
+_.templateSettings = {
+  evaluate: /<%([\s\S]+?)%>/g,
+  interpolate: /<%=([\s\S]+?)%>/g,
+  escape: /<%-([\s\S]+?)%>/g
+};
+```
+
+## 15. _.template
 
 _.template(templateString, [settings]) 
 将 JavaScript 模板编译为可以用于页面呈现的函数, 对于通过JSON数据源生成复杂的HTML并呈现出来的操作非常有用。 模板函数可以使用 <%= … %>插入变量, 也可以用<% … %>执行任意的 JavaScript 代码。 如果您希望插入一个值, 并让其进行HTML转义,请使用<%- … %>。 当你要给模板函数赋值的时候，可以传递一个含有与模板对应属性的data对象 。 如果您要写一个一次性的, 您可以传对象 data 作为第二个参数给模板 template 来直接呈现, 这样页面会立即呈现而不是返回一个模板函数. 参数 settings 是一个哈希表包含任何可以覆盖的设置 _.templateSettings.
 
 ```
+var noMatch = /(.)^/;
 
+var escapes = {
+  "'": "'",
+  '\\': '\\',
+  '\r': 'r',
+  '\n': 'n',
+  '\u2028': 'u2028',
+  '\u2029': 'u2029'
+};
+
+var escapeRegExp = /\\|'|\r|\n|\u2028|\u2029/g;
+
+var escapeChar = function(match) {
+  return '\\' + escapes[match];
+};
 ```
 
+```
+_.template = function(text, settings, oldSettings) {
+  if (!settings && oldSettings) settings = oldSettings;
+  // _.defaults(object, *defaults) 
+  // 用defaults对象填充object 中的undefined属性。 
+  settings = _.defaults({}, settings, _.templateSettings);
 
-## 15. _.templateSettings
+  // source 属性用于返回模式匹配所用的文本。
+  var matcher = RegExp([
+    (settings.escape || noMatch).source,
+    (settings.interpolate || noMatch).source,
+    (settings.evaluate || noMatch).source
+  ].join('|') + '|$', 'g');
+
+  // 编译模板源,适当转义字符串。
+  var index = 0;
+  var source = "__p+='";
+  // replace() 方法用于在字符串中用一些字符替换另一些字符，或替换一个与正则表达式匹配的子串。
+  text.replace(matcher, function(match, escape, interpolate, evaluate, offset) {
+    source += text.slice(index, offset).replace(escapeRegExp, escapeChar);
+    index = offset + match.length;
+
+    if (escape) {
+      source += "'+\n((__t=(" + escape + "))==null?'':_.escape(__t))+\n'";
+    } else if (interpolate) {
+      source += "'+\n((__t=(" + interpolate + "))==null?'':__t)+\n'";
+    } else if (evaluate) {
+      source += "';\n" + evaluate + "\n__p+='";
+    }
+
+    // Adobe VMs need the match returned to produce the correct offset.
+    return match;
+  });
+  source += "';\n";
+
+  // If a variable is not specified, place data values in local scope.
+  if (!settings.variable) source = 'with(obj||{}){\n' + source + '}\n';
+
+  source = "var __t,__p='',__j=Array.prototype.join," +
+    "print=function(){__p+=__j.call(arguments,'');};\n" +
+    source + 'return __p;\n';
+
+  var render;
+  try {
+    render = new Function(settings.variable || 'obj', '_', source);
+  } catch (e) {
+    e.source = source;
+    throw e;
+  }
+
+  var template = function(data) {
+    return render.call(this, data, _);
+  };
+
+  // Provide the compiled source as a convenience for precompilation.
+  var argument = settings.variable || 'obj';
+  template.source = 'function(' + argument + '){\n' + source + '}';
+
+  return template;
+};
+```
+
+1、 若settings不存在，且oldSettings存在，则吧oldSettings赋值给settings。
+
+2、 运行join('|')函数，把数组中的分隔符更换为|。并运行正则表达式RegExp()函数。
+
+3、 定义index的初始值为0，source的初始值为字符串"__p+='"。
+
+4、 运行replace()方法：
+
+1) 取text中index到offset位置之间的字符串，并使用replace()函数，替换一些字符后，把得到的text结果加上原来的source数据，把最后结果返回给source。
+
+2) 更新index的值。
+
+3) 若escape，则运行以下表达式：
+
+```
+source += "'+\n((__t=(" + escape + "))==null?'':_.escape(__t))+\n'";
+```
+
+4) 若interpolate，则运行以下表达式：
+
+```
+source += "'+\n((__t=(" + interpolate + "))==null?'':__t)+\n'";
+```
+
+5) 若evaluate，则运行以下表达式：
+
+```
+source += "';\n" + evaluate + "\n__p+='";
+```
+
+6) 返回match的值。
+
+5、 在source数据后面添加换行标志。
+
+6、 若settings.variable不存在，则运行以下代码：
+
+```
+source = 'with(obj||{}){\n' + source + '}\n';
+```
+
+7、 继续对source变量进行修改。
+
+8、 定义变量render，并且运行try...catch...函数。若没有报错，则新建function函数，并赋值给source。否则把source赋值给e.source，并抛出异常e。
+
+9、 运行template函数。
+
+10、 定义argument的值为settings.variable或字符串'obj'。
+
+11、 把template.source赋值为function的字符串。
+
+12、 返回template的值。
+
+例：
+
+```
+var compiled = _.template("hello: <%= name %>");
+var test = compiled({name: 'moe'});
+console.log(test);
+// hello: moe
 
 
+var template = _.template("<b><%- value %></b>");
+var test2 = template({value: '<script>'});
+console.log(test2);
+// <b>&lt;script&gt;</b>
+```
 
+您也可以在JavaScript代码中使用 print. 有时候这会比使用 <%= ... %> 更方便。
+
+```
+var compiled = _.template("<% print('Hello ' + epithet); %>");
+var test3 = compiled({epithet: "stooge"});
+console.log(test3);
+// Hello stooge
+```
+
+如果ERB式的分隔符您不喜欢, 您可以改变Underscore的模板设置, 使用别的符号来嵌入代码.定义一个 interpolate 正则表达式来逐字匹配嵌入代码的语句, 如果想插入转义后的HTML代码则需要定义一个 escape 正则表达式来匹配,还有一个 evaluate 正则表达式来匹配您想要直接一次性执行程序而不需要任何返回值的语句.您可以定义或省略这三个的任意一个.例如, 要执行Mustache.js类型的模板:
+
+```
+_.templateSettings = {
+  	interpolate: /\{\{(.+?)\}\}/g
+};
+
+var template = _.template("Hello {{ name }}!");
+var test4 = template({name: "Mustache"});
+console.log(test4);
+// "Hello Mustache!"
+```
+
+默认的, template 通过 with 语句来取得 data 所有的值. 当然, 您也可以在 variable 设置里指定一个变量名. 这样能显著提升模板的渲染速度.
+
+```
+var test6 = _.template("Using 'with': <%= data.answer %>", {variable: 'data'})({answer: 'no'});
+console.log(test6);
+// Using 'with': no
+```
+
+预编译模板对调试不可重现的错误很有帮助. 这是因为预编译的模板可以提供错误的代码行号和堆栈跟踪, 有些模板在客户端(浏览器)上是不能通过编译的 在编译好的模板函数上, 有 source 属性可以提供简单的预编译功能.
+
+```
+<script>
+  JST.project = <%= _.template(jstText).source %>;
+</script>
+```
 
 # 链式语法(Chaining)
 
+对一个对象使用 chain 方法, 会把这个对象封装并 让以后每次方法的调用结束后都返回这个封装的对象, 当您完成了计算, 可以使用 value 函数来取得最终的值. 以下是一个同时使用了 map/flatten/reduce 的链式语法例子, 目的是计算一首歌的歌词里每一个单词出现的次数.
+
+```
+var lyrics = [
+  {line: 1, words: "I'm a lumberjack and I'm okay"},
+  {line: 2, words: "I sleep all night and I work all day"},
+  {line: 3, words: "He's a lumberjack and he's okay"},
+  {line: 4, words: "He sleeps all night and he works all day"}
+];
+
+var test = _.chain(lyrics)
+  .map(function(line) { return line.words.split(' '); })
+  .flatten()
+  .reduce(function(counts, word) {
+    counts[word] = (counts[word] || 0) + 1;
+    return counts;
+  }, {})
+  .value();
+
+console.log(test);
+
+/*
+{
+	He:1,
+	He's:1,
+	I:2,
+	I'm:2,
+	a:2,
+	all:4,
+	and:4,
+	day:2,
+	he:1,
+	he's:1,
+	lumberjack:2,
+	night:2,
+	okay:2,
+	sleep:1,
+	sleeps:1,
+	work:1,
+	works:1
+}
+*/
+```
+
 ## 1. _.chain
 
+返回一个封装的对象. 在封装的对象上调用方法会返回封装的对象本身, 直到 value 方法调用为止.
 
+```
+var _ = function(obj) {
+  if (obj instanceof _) return obj;
+  if (!(this instanceof _)) return new _(obj);
+  this._wrapped = obj;
+};
 
-## 2. _(obj).value()
+_.chain = function(obj) {
+  var instance = _(obj);
+  instance._chain = true;
+  return instance;
+};
+```
 
+1、 运行_(obj)下划线函数，得到instance._wrapped=obj。
+
+2、 设置instance._chain为true，以此判断函数是否为链式结构。
+
+3、 返回instance的结果。
+
+例：
+
+```
+var stooges = [
+	{name: 'curly', age: 25}, 
+	{name: 'moe', age: 21}, 
+	{name: 'larry', age: 23}
+];
+var youngest = _.chain(stooges)
+  .sortBy(function(stooge){ return stooge.age; })
+  .map(function(stooge){ return stooge.name + ' is ' + stooge.age; })
+  .first()
+  .value();
+
+console.log(youngest);
+// moe is 21
+```
+
+## 2. _.value
+
+_(obj).value() 
+获取封装对象的最终值.
+
+```
+// 从wrapped和链接chained对象提取结果。
+_.prototype.value = function() {
+  return this._wrapped;
+};
+
+// 提供一些方法用于打开代理引擎操作,比如JSON stringification和算法。
+_.prototype.valueOf = _.prototype.toJSON = _.prototype.value;
+
+_.prototype.toString = function() {
+  return String(this._wrapped);
+};
+```
+
+1、 返回最后得到的this._wrapped结果。
+
+例：
+
+```
+var test = _([1, 2, 3]).value();
+console.log(test);
+//[1, 2, 3]
+```
 
