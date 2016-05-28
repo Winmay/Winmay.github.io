@@ -1,0 +1,117 @@
+---
+layout: post
+category: html事件使用
+---
+
+# div中onclick事件的使用
+
+我在一个div标签中，使用了onclick="click()"函数，可是运行的时候却发现onclick事件失效了。click()函数中，我就只写了alert语句，可是怎么点击这个div标签都不会有alert弹出框出现。
+
+后来，我在网上找了一下onclick事件在div标签中失效的问题。发现很多人都直接更换了click事件的使用方法，他们干脆使用jquery或js语言来实现，没有改变根本问题。
+
+其实，onclick事件在div标签中失效的原因很简单，就是click()函数的函数名是不可使用的，必需把click这个函数名更改为其他不是关键字的名字，onclick事件就可以在div标签中运行。
+
+demo：
+
+```
+<!DOCTYPE html>
+<html>
+<head>
+	<meta charset="utf-8">
+	<title>div标签中使用onclick事件</title>
+	<style type="text/css">
+		.wrap{
+			border:1px solid #ccc;
+			height:130px;
+			width:300px;
+		}
+		.title{
+			color:#000;
+			font-size:15px;
+			line-height:22px;
+			text-align:center;
+			margin:26px 20px 26px 20px;
+			font-weight:bold;
+		}
+		.button{
+			border-top:1px solid #439DD2;
+			height:45px;
+			line-height:45px;
+			color:#439DD2;
+			text-align:center;
+			cursor:pointer;
+			overflow:hidden;
+		}
+	</style>
+</head>
+<body>
+	<script type="text/javascript">
+		function clickThis(){
+			alert('已点击');
+		}
+	</script>
+	<div class='wrap'>
+		<div class='title'>使用键盘鼠标点击确定按钮</div>
+		<div class='button' onclick="clickThis()">确定</div>
+	</div>
+</body>
+</html>
+```
+
+# div中onkeydown事件的使用
+
+在div中响应onkeydown事件需要达到两点：
+
+1. 需要设置该div的tabIndex属性。tabIndex 属性可设置或返回按钮的 tab 键控制次序。把div标签设置为可以获取焦点的元素。
+2. 需要聚焦到该div标签，js代码写的话即div.focus()。使用onkeydown事件的目的就是方便键盘使用，所以要用js代码获取直接获取div标签的焦点，而不需要使用鼠标去获取焦点。
+
+demo：
+
+```
+<!DOCTYPE html>
+<html>
+<head>
+	<meta charset="utf-8">
+	<title>模拟alert使用enter点击确定，div标签中使用onKeyDown</title>
+	<style type="text/css">
+		.wrap{
+			border:1px solid #ccc;
+			height:130px;
+			width:300px;
+		}
+		.title{
+			color:#000;
+			font-size:15px;
+			line-height:22px;
+			text-align:center;
+			margin:26px 20px 26px 20px;
+			font-weight:bold;
+		}
+		#button{
+			border-top:1px solid #439DD2;
+			height:45px;
+			line-height:45px;
+			color:#439DD2;
+			text-align:center;
+			cursor:pointer;
+			overflow:hidden;
+		}
+	</style>
+</head>
+<body>
+	<div class='wrap'>
+		<div class='title'>使用键盘enter点击确定按钮</div>
+		<div id='button' tabIndex='-1' onkeydown="enterThis(event)">确定</div>
+	</div>
+	<script type="text/javascript">
+		document.getElementById('button').focus();
+		function enterThis(event){
+			if(event.which == 13)
+				alert('已点击');
+		}
+	</script>
+</body>
+</html>
+```
+
+
