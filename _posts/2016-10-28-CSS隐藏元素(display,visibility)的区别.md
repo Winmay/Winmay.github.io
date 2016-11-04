@@ -79,7 +79,7 @@ visibility:inherit
 
 ## visibility特性
 
-用来确定元素是显示还是隐藏，这用visibility="visible|hidden"来表示，visible表示显示，hidden表示隐藏。当visibility被设置为"hidden"的时候，元素虽然被隐藏了，但它仍然占据它原来所在的位置。
+用来确定元素是显示还是隐藏，这用visibility="visible/hidden"来表示，visible表示显示，hidden表示隐藏。当visibility被设置为"hidden"的时候，元素虽然被隐藏了，但它仍然占据它原来所在的位置。
 
 # visibility和display的区别
 
