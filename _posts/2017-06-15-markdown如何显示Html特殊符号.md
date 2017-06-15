@@ -38,11 +38,9 @@ category: markdown
 如：写\<div\>标签可以有三种方法
 
 ```
-	
-	\<div\>
-	&lt;div&gt;
-	&#60;div&#62;
-	
+	//方法一： \<div\>
+	//方法二： &lt;div&gt;
+	//方法三： &#60;div&#62;
 ```
 
 
