@@ -13,25 +13,25 @@ category: markdown
 
 显示结果 | 描述 | 实体名称 | 实体编号
 ------- | ---- | ------ | ------
-&nbsp; | 空格 | \&nbsp; | \&#160;
-&lt; | 小于号 | \&lt; | \&#60;
-&gt; | 大于号 | \&gt; | \&#62;
-&amp; | 和号 | \&amp; | \&#38;
-&quot; | 引号 | \&quot; | \&#34;
-&apos; | 撇号 | \&apos; | \&#39;
+&nbsp; | 空格 | &amp;nbsp; | &amp;#160;
+&lt; | 小于号 | &amp;lt; | &amp;#60;
+&gt; | 大于号 | &amp;gt; | &amp;#62;
+&amp; | 和号 | &amp;amp; | &amp;#38;
+&quot; | 引号 | &amp;quot; | &amp;#34;
+&apos; | 撇号 | &amp;apos; | &amp;#39;
 
 其他一些常用的字符实体：
 
 显示结果 | 描述 | 实体名称 | 实体编号
 ------- | ---- | ------ | ------
-&cent; | 分 | \&cent; | \&#162;
-&pound; | 镑 | \&pound; | \&#163;
-&yen; | 日圆 | \&yen; | \&#165;
-&sect; | 节 | \&sect; | \&#167;
-&copy; | 版权 | \&copy; | \&#169;
-&reg; | 注册商标 | \&reg; | \&#174;
-&times; | 乘号 | \&times; | \&#215;
-&divide; | 除号 | \&divide; | \&#247;
+&cent; | 分 | &amp;cent; | &amp;#162;
+&pound; | 镑 | &amp;pound; | &amp;#163;
+&yen; | 日圆 | &amp;yen; | &amp;#165;
+&sect; | 节 | &amp;sect; | &amp;#167;
+&copy; | 版权 | &amp;copy; | &amp;#169;
+&reg; | 注册商标 | &amp;reg; | &amp;#174;
+&times; | 乘号 | &amp;times; | &amp;#215;
+&divide; | 除号 | &amp;divide; | &amp;#247;
 
 ***还有另外一个答案：使用转义字符&nbsp;&nbsp;&nbsp;&nbsp;“&nbsp;\\&nbsp;”&nbsp;&nbsp;&nbsp;&nbsp;！！！***
 
