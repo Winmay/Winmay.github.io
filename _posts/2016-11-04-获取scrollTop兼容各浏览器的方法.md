@@ -28,7 +28,7 @@ var scrollTop = document.documentElement.scrollTop || window.pageYOffset || docu
 
 通过这句赋值就能在任何情况下获得scrollTop 值。 
 
-仔细观察这句赋值，你会发现window.pageYOffset  (Safari)   被放置在 || 的中间位置。
+仔细观察这句赋值，你会发现window.pageYOffset  (Safari)   被放置在 \|\| 的中间位置。
 
 因为当 数字0 与 undefine 进行 或运算时，系统默认返回最后一个值。即或运算中 0 == undefine ; 
 
