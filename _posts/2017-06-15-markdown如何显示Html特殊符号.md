@@ -3,7 +3,7 @@ layout: post
 category: markdown
 ---
 
-#markdown如何显示Html特殊符号
+# markdown如何显示Html特殊符号
 
 例如我们在编写markdown的时候，常常希望使用一些html标签来说明问题，例如&lt;div&gt;标签，可是如果直接在markdown中输入**&lt;&gt;**这两个符号的话，这两个符号，包括里面的内容都不会显示在页面中，就像丢失了一样。那么，我们到底需要使用什么方法才能把这两个符号在markdown中显示出来呢？
 
